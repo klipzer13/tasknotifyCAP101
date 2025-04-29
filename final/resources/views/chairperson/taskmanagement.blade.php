@@ -411,25 +411,41 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="all-tasks-tab" data-bs-toggle="tab" data-bs-target="#all-tasks"
                         type="button" role="tab">
-                        All Tasks
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-list-check me-2"></i>
+                            <span>All Tasks</span>
+                            <span class="task-count-badge bg-primary-soft ms-2">{{ $tasks->count() }}</span>
+                        </div>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-tasks"
                         type="button" role="tab">
-                        Pending Approval
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-clock me-2"></i>
+                            <span>Pending</span>
+                            <span class="task-count-badge bg-warning-soft ms-2">{{ $pendingApprovals->count() }}</span>
+                        </div>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="in-progress-tab" data-bs-toggle="tab" data-bs-target="#in-progress-tasks"
                         type="button" role="tab">
-                        In Progress
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-spinner me-2"></i>
+                            <span>In Progress</span>
+                            <span class="task-count-badge bg-info-soft ms-2">{{ $inProgressTasks->count() }}</span>
+                        </div>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-tasks"
                         type="button" role="tab">
-                        Completed
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span>Completed</span>
+                            <span class="task-count-badge bg-success-soft ms-2">{{ $completedTasks->count() }}</span>
+                        </div>
                     </button>
                 </li>
             </ul>
@@ -501,72 +517,79 @@
                 <!-- Pending Approval Tab -->
                 <div class="tab-pane fade" id="pending-tasks" role="tabpanel">
                     @if($pendingApprovals->count() > 0)
-                                @foreach($assignees as $assignee)
-                                            @php
-                                                $assigneeTasks = $pendingApprovals->filter(function ($task) use ($assignee) {
-                                                    return $task->assignees->contains('id', $assignee->id);
-                                                });
-                                            @endphp
+                                    @foreach($assignees as $assignee)
+                                                @php
 
-                                            @if($assigneeTasks->count() > 0)
-                                                <div class="assignee-section" data-assignee="{{ $assignee->id }}">
-                                                    <div class="assignee-header">
-                                                        <img src="{{ $assignee->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
-                                                            class="assignee me-3" alt="{{ $assignee->name }}">
-                                                        <h5 class="mb-0">{{ $assignee->name }}</h5>
-                                                        <span class="assignee-tasks-count">{{ $assigneeTasks->count() }} tasks</span>
-                                                    </div>
+                                                    $assigneeTasks = $pendingApprovals->filter(function ($task) use ($assignee) {
+                                                        return $task->assignees->contains('id', $assignee->id) &&
+                                                            optional($task->current_status)->name === 'pending_approval';
+                                                    });
 
-                                                    @foreach($assigneeTasks as $task)
-                                                        <div class="task-card mb-3">
-                                                            <div class="task-card-header">
-                                                                <div>
-                                                                    <span class="task-title">{{ $task->title }}</span>
-                                                                    <span class="priority-badge priority-{{ $task->priority->name ?? 'medium' }}">
-                                                                        {{ ucfirst($task->priority->name ?? 'Medium') }} Priority
+                                                @endphp
+
+
+                                                @if($assigneeTasks->count() > 0)
+
+
+                                                    <div class="assignee-section" data-assignee="{{ $assignee->id }}">
+                                                        <div class="assignee-header">
+                                                            <img src="{{ $assignee->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
+                                                                class="assignee me-3" alt="{{ $assignee->name }}">
+                                                            <h5 class="mb-0">{{ $assignee->name }}</h5>
+                                                            <span class="assignee-tasks-count">{{ $assigneeTasks->count() }} tasks</span>
+                                                        </div>
+
+                                                        @foreach($assigneeTasks as $task)
+
+                                                            <div class="task-card mb-3">
+                                                                <div class="task-card-header">
+                                                                    <div>
+                                                                        <span class="task-title">{{ $task->title }}</span>
+                                                                        <span class="priority-badge priority-{{ $task->priority->name ?? 'medium' }}">
+                                                                            {{ ucfirst($task->priority->name ?? 'Medium') }} Priority
+                                                                        </span>
+                                                                    </div>
+                                                                    <span class="status-badge status-pending-approval">
+                                                                        Pending Approval
                                                                     </span>
                                                                 </div>
-                                                                <span class="status-badge status-pending-approval">
-                                                                    Pending Approval
-                                                                </span>
-                                                            </div>
-                                                            <div class="task-card-body">
-                                                                <div class="task-meta">
-                                                                    <span><i class="fas fa-calendar-alt"></i> Due:
-                                                                        {{ $task->due_date->format('M d, Y') }}</span>
-                                                                    <span><i class="fas fa-building"></i> {{ $task->department ?? 'General' }}</span>
-                                                                </div>
-                                                                <p class="task-description">
-                                                                    {{ Str::limit($task->description, 200) }}
-                                                                </p>
-                                                                <div class="task-actions">
-                                                                    <a href="{{ route('chairperson.tasks.review', $task->id) }}"
-                                                                        class="btn btn-sm btn-outline-primary me-2">
-                                                                        <i class="fas fa-eye me-1"></i> View Details
-                                                                    </a>
-                                                                    <form
-                                                                        action="{{ route('chairperson.tasks.approve-assignee', ['task' => $task->id, 'user' => $assignee->id]) }}"
-                                                                        method="POST" class="d-inline me-2">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-sm btn-outline-success">
-                                                                            <i class="fas fa-check me-1"></i> Approve
-                                                                        </button>
-                                                                    </form>
-                                                                    <form
-                                                                        action="{{ route('chairperson.tasks.reject-assignee', ['task' => $task->id, 'user' => $assignee->id]) }}"
-                                                                        method="POST" class="d-inline">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                            <i class="fas fa-times me-1"></i> Reject
-                                                                        </button>
-                                                                    </form>
+                                                                <div class="task-card-body">
+                                                                    <div class="task-meta">
+                                                                        <span><i class="fas fa-calendar-alt"></i> Due:
+                                                                            {{ $task->due_date->format('M d, Y') }}</span>
+                                                                        <span><i class="fas fa-building"></i> {{ $task->department ?? 'General' }}</span>
+                                                                    </div>
+                                                                    <p class="task-description">
+                                                                        {{ Str::limit($task->description, 200) }}
+                                                                    </p>
+                                                                    <div class="task-actions">
+                                                                        <a href="{{ route('chairperson.tasks.review', $task->id) }}"
+                                                                            class="btn btn-sm btn-outline-primary me-2">
+                                                                            <i class="fas fa-eye me-1"></i> View Details
+                                                                        </a>
+                                                                        <form
+                                                                            action="{{ route('chairperson.tasks.approve-assignee', ['task' => $task->id, 'user' => $assignee->id]) }}"
+                                                                            method="POST" class="d-inline me-2">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                                                <i class="fas fa-check me-1"></i> Approve
+                                                                            </button>
+                                                                        </form>
+                                                                        <form
+                                                                            action="{{ route('chairperson.tasks.reject-assignee', ['task' => $task->id, 'user' => $assignee->id]) }}"
+                                                                            method="POST" class="d-inline">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                                <i class="fas fa-times me-1"></i> Reject
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                @endforeach
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                    @endforeach
                     @else
                         <div class="empty-state">
                             <i class="fas fa-clock"></i>
@@ -574,6 +597,7 @@
                             <p>There are currently no tasks awaiting your approval.</p>
                         </div>
                     @endif
+
                 </div>
 
                 <!-- In Progress Tab -->

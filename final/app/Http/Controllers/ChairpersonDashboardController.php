@@ -12,6 +12,7 @@ use App\Models\Priority;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Task_User;
 
 class ChairpersonDashboardController extends Controller
 {
@@ -42,27 +43,26 @@ class ChairpersonDashboardController extends Controller
         };
 
         // Get total tasks count for the user's department
-        $totalTasks = Task::whereHas('users', function ($query) use ($userDepartmentId) {
-            $query->where('department_id', $userDepartmentId);
-        })
-            ->count();
-
-        // Get overdue tasks for the user's department
-        $overdueTasks = Task::whereHas('users', function ($query) use ($userDepartmentId) {
-            $query->where('department_id', $userDepartmentId);
-        })
-            ->where('due_date', '<', now())
-            ->whereHas('users', function ($query) {
-                $query->where('status_id', '!=', $this->statusIds['completed']);
+        $totalTasks = Task::where('created_by', Auth::id())
+            ->whereHas('users', function ($query) use ($userDepartmentId) {
+                $query->where('department_id', $userDepartmentId);
             })
             ->count();
 
-        // Get completed tasks for the user's department
-        $completedTasks = Task::whereHas('users', function ($query) use ($userDepartmentId) {
-            $query->where('department_id', $userDepartmentId);
-        })
-            ->whereHas('users', function ($query) {
-                $query->where('status_id', $this->statusIds['completed']);
+        // Get overdue tasks created by the authenticated user
+        $overdueTasks = Task::where('created_by', Auth::id())
+            ->where('due_date', '<', now())
+            ->whereHas('users', function ($query) use ($userDepartmentId) {
+                $query->where('department_id', $userDepartmentId)
+                    ->where('status_id', '!=', $this->statusIds['completed']);
+            })
+            ->count();
+
+        // Get completed tasks created by the authenticated user
+        $completedTasks = Task::where('created_by', Auth::id())
+            ->whereHas('users', function ($query) use ($userDepartmentId) {
+                $query->where('department_id', $userDepartmentId)
+                    ->where('status_id', $this->statusIds['pending']);
             })
             ->count();
 
@@ -107,7 +107,9 @@ class ChairpersonDashboardController extends Controller
             ->orderBy('completed_tasks', 'desc')
             ->take(4)
             ->get();
-        $teamMembersCount = User::where('id', '!=', Auth::id())->count();
+        $teamMembersCount = User::where('id', '!=', Auth::id())
+            ->where('role_id', '!=', 1) // Exclude users with role 1 (admin)
+            ->count();
 
         // Get upcoming deadlines (tasks due in the next 7 days)
         $upcomingDeadlines = Task::whereBetween('due_date', [now(), now()->addDays(7)])
@@ -233,7 +235,13 @@ class ChairpersonDashboardController extends Controller
         $departmentId = Auth::user()->department_id;
 
         $teamMembers = User::where('department_id', $departmentId)
+            ->with([
+                'tasks' => function ($query) {
+                    $query->withPivot('status_id');
+                }
+            ])
             ->where('id', '!=', Auth::id())
+            ->where('id', '!=', 1) // Exclude users with user_id 1
             ->withCount([
                 'tasks as completed_tasks' => function ($query) {
                     $query->where('status_id', $this->statusIds['completed']);
@@ -246,6 +254,7 @@ class ChairpersonDashboardController extends Controller
             ])
             ->orderBy('completed_tasks', 'desc')
             ->paginate(10);
+        // dd($teamMembers);
 
         return view('chairperson.team-performance', compact('teamMembers'));
     }
@@ -323,31 +332,42 @@ class ChairpersonDashboardController extends Controller
             'priority',
             'creator',
             'users' => function ($query) {
-                $query->withPivot('status_id');
+            $query->withPivot('status_id');
+            },
+            'assignees' => function ($query) {
+            $query->select('users.id', 'users.name'); // Select only necessary fields
             }
         ])
             ->whereHas('users', function ($query) use ($departmentId) {
-                $query->where('department_id', $departmentId);
+            $query->where('department_id', $departmentId);
             })
             ->latest()
             ->get()
             ->each(function ($task) {
-                $task->current_status = $task->users->first()->pivot->status_id
-                    ? Status::find($task->users->first()->pivot->status_id)
-                    : null;
+            $task->current_status = $task->users->first()->pivot->status_id
+                ? Status::find($task->users->first()->pivot->status_id)
+                : null;
+            $task->assignee_names = $task->assignees->pluck('name')->toArray(); // Collect assignee names
             });
 
         // Get tasks by status
         $pendingApprovals = $this->getTasksByStatus($this->statusIds['pending_approval'], $departmentId);
         $inProgressTasks = $this->getTasksByStatus($this->statusIds['in_progress'], $departmentId);
         $completedTasks = $this->getTasksByStatus($this->statusIds['completed'], $departmentId);
+        $myTasks = Task::whereHas('assignees', function($query) {
+            $query->where('user_id', Auth::id()); // Only tasks assigned to current user
+        })
+        ->with(['priority', 'assignees'])
+        ->orderBy('due_date', 'asc')
+        ->get();
 
         return view('chairperson.taskmanagement', compact(
             'tasks',
             'pendingApprovals',
             'inProgressTasks',
             'completedTasks',
-            'assignees'
+            'assignees',
+            'myTasks'
         ));
     }
 
@@ -469,8 +489,31 @@ class ChairpersonDashboardController extends Controller
 
         return back()->with('success', 'Task has been assigned successfully!');
     }
-    public function settings(){
+    public function settings()
+    {
         return view('chairperson.settings');
+    }
+    public function show($id)
+    {
+        $task = Task::with([
+            'priority',
+            'creator',
+            'attachments',
+            'comments.user',
+            'users'
+        ])
+            ->whereHas('users', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->findOrFail($id);
+
+        $userStatus = $task->users()->where('user_id', Auth::id())->first()->pivot->status_id;
+        $status = Status::findOrFail($userStatus);
+        dd($task);
+        return view('chairperson.task-details', [
+            'task' => $task,
+            'status' => $status
+        ]);
     }
 
 

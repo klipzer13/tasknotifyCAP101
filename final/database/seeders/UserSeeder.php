@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             'username' => 'admin',
             'role_id' => $adminRole->id,
             'department_id' => $itDept->id,
-            'avatar' => 'profile/avatar/profile.png'
+            'avatar' => 'storage/profile/avatars/profile.png'
         ]);
         
     }

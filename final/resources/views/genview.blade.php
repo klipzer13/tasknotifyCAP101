@@ -467,36 +467,35 @@
         </div>
         <ul class="sidebar-menu">
             <li class="{{ request()->routeIs('task.dashboard') ? 'active' : '' }}">
-                <a href="{{ route('task.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ route('task.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
             </li>
             <li class="{{ request()->routeIs('task.index') ? 'active' : '' }}">
-                <a href="{{ route('task.index') }}"><i class="fas fa-tasks"></i> All Tasks</a>
+            <a href="{{ route('task.index') }}"><i class="fas fa-tasks"></i> All Tasks</a>
             </li>
             <li class="{{ request()->routeIs('assign.task') ? 'active' : '' }}">
-                <a href="{{ route('assign.task') }}"><i class="fas fa-tasks"></i> Assign Tasks</a>
+            <a href="{{ route('assign.task') }}"><i class="fas fa-tasks"></i> Assign Tasks</a>
             </li>
             <li class="{{ request()->routeIs('task.members') ? 'active' : '' }}">
-                <a href="{{ route('task.members') }}"><i class="fas fa-users"></i> Members</a>
+            <a href="{{ route('task.members') }}"><i class="fas fa-users"></i> Members</a>
             </li>
-
-            <!-- <li class="">
-                <a href="#"><i class="fas fa-cog"></i> Reports</a>
-            </li> -->
             <li class="{{ request()->routeIs('task.report') ? 'active' : '' }}">
-                <a href="#"><i class="fas fa-cog"></i> Reports</a>
+            <a href="#"><i class="fas fa-cog"></i> Reports</a>
             </li>
             <li class="{{ request()->routeIs('task.document') ? 'active' : '' }}">
-                <a href="{{ route('task.document') }}"><i class="fas fa-file-alt"></i> Documents</a>
+            <a href="{{ route('task.document') }}"><i class="fas fa-file-alt"></i> Documents</a>
+            </li>
+            <li class="">
+            <a href="#"><i class="fas fa-history"></i> Audit Logs</a>
             </li>
             <li>
-                <a href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                    class="text-white text-decoration-none">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-                <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
-                    @csrf
-                </form>
+            <a href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="text-white text-decoration-none">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                @csrf
+            </form>
             </li>
         </ul>
     </div>

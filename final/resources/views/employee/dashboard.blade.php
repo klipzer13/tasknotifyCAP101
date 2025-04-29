@@ -1,581 +1,568 @@
 @extends('employee.genemp')
 @section('tittle', 'Dashboard')
 @section('content')
-<!-- Main Content -->
-<div class="main-content" id="mainContent">
-    <!-- Top Navigation -->
-    <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-        <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="d-flex align-items-center">
-            <div class="position-relative me-3">
-                <i class="fas fa-bell fs-5"></i>
-                <span class="notification-badge">3</span>
-            </div>
-            <div class="user-profile">
-                <img src="{{ Auth::user()->avatar_url ?? 'https://via.placeholder.com/40' }}" alt="User" class="rounded-circle">
-                <span>{{ Auth::user()->name }}</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4><i class="fas fa-calendar me-2"></i> Task Calendar</h4>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-            <i class="fas fa-plus me-2"></i> Add Task
-        </button>
-    </div>
-    
-    <!-- Stats Row -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="dashboard-card">
-                <div class="stat-number">{{ $activeTasks }}</div>
-                <div class="stat-label">Active Tasks</div>
-                <div class="progress mt-2" style="height: 8px;">
-                    <!-- <div class="progress-bar" style="width: {{ $activeTasks > 0 ? ($completedPercentage) : 0 }}%"></div> -->
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navigation -->
+        <div class="top-nav d-flex justify-content-between align-items-center mb-4">
+            <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                    <i class="fas fa-bell fs-5"></i>
+                    <span class="notification-badge">3</span>
                 </div>
-                <small class="text-muted">{{ $completedPercentage }}% completed</small>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="dashboard-card">
-                <div class="stat-number">{{ $overdueTasks }}</div>
-                <div class="stat-label">Overdue Tasks</div>
-                <div class="progress mt-2" style="height: 8px;">
-                    <!-- <div class="progress-bar bg-danger" style="width: {{ $overdueTasks > 0 ? 100 : 0 }}%"></div> -->
+                <div class="user-profile">
+                    <img src="{{ Auth::user()->avatar_url ?? 'https://via.placeholder.com/40' }}" alt="User"
+                        class="rounded-circle">
+                    <span>{{ Auth::user()->name }}</span>
                 </div>
-                <small class="text-muted">Need attention</small>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="dashboard-card">
-                <div class="stat-number">{{ $completedTasks }}</div>
-                <div class="stat-label">Completed</div>
-                <div class="progress mt-2" style="height: 8px;">
-                    <!-- <div class="progress-bar bg-success" style="width: {{ $completedPercentage }}%"></div> -->
-                </div>
-                <small class="text-muted">This month</small>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="dashboard-card">
-                <div class="stat-number">{{ $hoursLogged }}</div>
-                <div class="stat-label">Hours Logged</div>
-                <div class="progress mt-2" style="height: 8px;">
-                    <div class="progress-bar bg-info" style="width: 60%"></div>
-                </div>
-                <small class="text-muted">This week</small>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Task Calendar -->
-    <div class="dashboard-card">
-        <div class="card-header">
-            <h5 class="mb-0">My Task Calendar</h5>
-            <div class="btn-group">
-                <button class="btn btn-sm btn-outline-secondary" id="prevWeek">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" id="today">
-                    Today
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" id="nextWeek">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-        <div id="taskCalendar"></div>
-    </div>
-</div>
 
-<!-- Add Task Modal -->
-<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Dashboard Header -->
+
+
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card">
+                    <div class="stat-number">{{ $activeTasks }}</div>
+                    <div class="stat-label">Active Tasks</div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <!-- <div class="progress-bar" style="width: {{ $activeTasks > 0 ? ($completedPercentage) : 0 }}%"></div> -->
+                    </div>
+                    <small class="text-muted">{{ $completedPercentage }}% completed</small>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="taskForm" action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="taskTitle" class="form-label">Task Title</label>
-                        <input type="text" class="form-control" id="taskTitle" name="title" required>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card">
+                    <div class="stat-number">{{ $overdueTasks }}</div>
+                    <div class="stat-label">Overdue Tasks</div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <!-- <div class="progress-bar bg-danger" style="width: {{ $overdueTasks > 0 ? 100 : 0 }}%"></div> -->
                     </div>
-                    <div class="mb-3">
-                        <label for="taskDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="taskDescription" name="description" rows="3"></textarea>
+                    <small class="text-muted">Need attention</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card">
+                    <div class="stat-number">{{ $completedTasks }}</div>
+                    <div class="stat-label">Completed</div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <!-- <div class="progress-bar bg-success" style="width: {{ $completedPercentage }}%"></div> -->
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDate" name="start_date" required>
+                    <small class="text-muted">This month</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="dashboard-card">
+                    <div class="stat-number">{{ $hoursLogged }}</div>
+                    <div class="stat-label">Hours Logged</div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: 60%"></div>
+                    </div>
+                    <small class="text-muted">This week</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Calendar -->
+        <div class="dashboard-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">My Task Calendar</h5>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" id="prevWeek">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="today">
+                        Today
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" id="nextWeek">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="taskCalendar"></div>
+        </div>
+    </div>
+
+    <!-- Task View Modal -->
+    <div class="modal fade task-modal" id="taskViewModal" tabindex="-1" aria-labelledby="taskViewModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fs-5" id="taskViewModalLabel">Task Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="task-loading-indicator" class="text-center py-5">
+                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
-                        <div class="col-md-6">
-                            <label for="dueDate" class="form-label">Due Date</label>
-                            <input type="date" class="form-control" id="dueDate" name="due_date" required>
+                        <p class="mt-3 text-muted">Loading task details...</p>
+                    </div>
+
+                    <div id="task-details-container" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h4 id="task-modal-title" class="fw-bold mb-2"></h4>
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <span id="task-modal-status" class="badge rounded-pill"></span>
+                                    <span id="task-modal-priority" class="badge rounded-pill"></span>
+                                    <span id="task-modal-due-date" class="text-muted small"></span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="text-muted small">Assigned by:</span>
+                                    <span id="task-modal-creator" class="fw-semibold"></span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-muted small">Assigned on:</span>
+                                    <span id="task-modal-created-at" class="fw-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-3 text-uppercase small text-muted">Description</h6>
+                            <div id="task-modal-description" class="p-3 bg-light rounded"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <h6 class="fw-semibold mb-3 text-uppercase small text-muted">Attachments</h6>
+                                <div id="task-modal-attachments" class="d-flex flex-wrap gap-3">
+                                    <!-- Attachments will be loaded here -->
+                                    <div class="text-center py-3 w-100">
+                                        <p class="text-muted">No attachments available</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <h6 class="fw-semibold mb-3 text-uppercase small text-muted">Comments</h6>
+                                <div id="task-modal-comments" class="comment-section bg-light rounded p-3">
+                                    <!-- Comments will be loaded here -->
+                                    <div class="text-center py-2">
+                                        <p class="text-muted">No comments yet</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="task-submission-form-container">
+                            <form id="taskSubmissionForm" action="/tasks/submit" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="task_id" id="submission_task_id">
+                                <div class="mb-3">
+                                    <label for="comment" class="form-label fw-semibold">Add Comment</label>
+                                    <textarea class="form-control" id="comment" name="comment" rows="3"
+                                        placeholder="Add your comments here..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="attachments" class="form-label fw-semibold">Add Attachments</label>
+                                    <input class="form-control" type="file" id="attachments" name="attachments[]" multiple>
+                                    <div class="form-text">Upload relevant files (max 5MB each)</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary px-4 py-2" id="submitTaskBtn">
+                                    <i class="fas fa-paper-plane me-2"></i> Submit Task
+                                </button>
+                            </form>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="taskPriority" class="form-label">Priority</label>
-                        <select class="form-select" id="taskPriority" name="priority_id" required>
-                            @foreach($priorities as $priority)
-                                <option value="{{ $priority->id }}">{{ $priority->name }}</option>
-                            @endforeach
-                        </select>
+
+                    <div id="task-error-container" style="display: none;">
+                        <!-- Error content here -->
                     </div>
-                    <div class="mb-3">
-                        <label for="taskAssignees" class="form-label">Assignees</label>
-                        <select class="form-select" id="taskAssignees" name="assignees[]" multiple>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="attachments" class="form-label">Attachments</label>
-                        <input type="file" class="form-control" id="attachments" name="attachments[]" multiple>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Task</button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Task Detail Modal -->
-<div class="modal fade task-modal" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskDetailModalLabel">Task Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h4 id="detailTaskTitle"></h4>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="priority-badge" id="detailPriority"></span>
-                            <span class="badge bg-secondary" id="detailStatus"></span>
-                        </div>
-                        <p id="detailDescription" class="mb-4"></p>
-                        
-                        <div class="task-meta mb-4">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <strong><i class="fas fa-user me-2"></i>Assigned by:</strong> 
-                                        <span id="detailCreator"></span>
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong><i class="fas fa-calendar-plus me-2"></i>Start Date:</strong> 
-                                        <span id="detailStartDate"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <strong><i class="fas fa-calendar-check me-2"></i>Due Date:</strong> 
-                                        <span id="detailDueDate"></span>
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong><i class="fas fa-users me-2"></i>Assignees:</strong> 
-                                        <span id="detailAssignees"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Progress Section -->
-                        <div class="progress-section mb-4">
-                            <div class="progress mb-2">
-                                <div class="progress-bar" id="detailProgress" role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <small class="text-muted" id="progressText">Task progress</small>
-                        </div>
-                        
-                        <!-- Completion Section -->
-                        <div class="completion-section mb-4" id="completionSection" style="display: none;">
-                            <hr>
-                            <h5><i class="fas fa-check-circle me-2"></i>Submit Completion</h5>
-                            <div class="mb-3">
-                                <label for="completionComments" class="form-label">Completion Notes</label>
-                                <textarea class="form-control" id="completionComments" rows="3" 
-                                    placeholder="Describe what you've completed and any important details"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="completionAttachments" class="form-label">Supporting Documents</label>
-                                <input type="file" class="form-control" id="completionAttachments" 
-                                    name="completion_attachments[]" multiple>
-                                <small class="text-muted">Upload any files that prove task completion</small>
-                            </div>
-                        </div>
-                        
-                        <!-- Comments Section - Fixed Implementation -->
-                        <div class="comments-section mb-4">
-                            <hr>
-                            <h5><i class="fas fa-comments me-2"></i>Task Comments</h5>
-                            <div id="commentsList" class="mb-3">
-                                <!-- Comments will be loaded here -->
-                            </div>
-                            <div class="add-comment">
-                                <form id="commentForm">
-                                    @csrf
-                                    <input type="hidden" id="commentTaskId" name="task_id">
-                                    <textarea class="form-control mb-2" id="newComment" name="comment" placeholder="Add a comment..." required></textarea>
-                                    <button type="submit" class="btn btn-sm btn-primary">Add Comment</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <!-- Attachments Section -->
-                        <div class="attachments-section">
-                            <h5><i class="fas fa-paperclip me-2"></i>Attachments</h5>
-                            <div id="attachmentsList" class="list-group">
-                                <!-- Attachments will be loaded here -->
-                            </div>
-                            
-                            <!-- Add Attachment Button -->
-                            <div class="add-attachment mt-3" id="addAttachmentSection">
-                                <form id="attachmentForm">
-                                    @csrf
-                                    <input type="hidden" id="attachmentTaskId" name="task_id">
-                                    <input type="file" class="form-control mb-2" id="newAttachment" name="attachments[]" multiple>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">Upload File</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <div id="completionControls">
-                    <!-- Completion checkbox will be placed here dynamically -->
-                </div>
-                <button type="button" class="btn btn-primary" id="updateTask">Save Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Get tasks from server via AJAX
-    fetch('{{ route("api.tasks") }}')
-        .then(response => response.json())
-        .then(data => {
-            initializeCalendar(data);
-        })
-        .catch(error => {
-            console.error('Error loading tasks:', error);
-            alert('Error loading tasks. Please refresh the page.');
-        });
-        
-    function initializeCalendar(taskData) {
-        const calendarEl = document.getElementById('taskCalendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: taskData.map(task => ({
-                id: task.id,
-                title: task.title,
-                start: task.start_date || task.created_at,
-                end: task.due_date,
-                className: `fc-event-${task.priority.name.toLowerCase()}-priority`,
-                extendedProps: {
-                    description: task.description,
-                    priority: task.priority,
-                    status: task.user_status || 'pending',
-                    creator: task.creator,
-                    assignees: task.users || [],
-                    attachments: task.attachments || [],
-                    comments: task.comments || [],
-                    task_id: task.id,
-                    is_participant: task.is_participant
-                }
-            })),
-            eventClick: function(info) {
-                const task = info.event;
-                const props = task.extendedProps;
-                
-                // Set the task ID for forms
-                document.getElementById('commentTaskId').value = props.task_id;
-                document.getElementById('attachmentTaskId').value = props.task_id;
-                
-                // Populate task details (same as before)
-                document.getElementById('detailTaskTitle').textContent = task.title;
-                document.getElementById('detailDescription').textContent = props.description || 'No description provided';
-                document.getElementById('detailCreator').textContent = props.creator ? props.creator.name : 'Unknown';
-                
-                // Set priority badge
-                const priorityBadge = document.getElementById('detailPriority');
-                const priorityName = props.priority.name || 'Medium';
-                priorityBadge.textContent = priorityName;
-                priorityBadge.className = 'priority-badge ';
-                if(priorityName.toLowerCase() === 'high') {
-                    priorityBadge.className += 'priority-high';
-                } else if(priorityName.toLowerCase() === 'medium') {
-                    priorityBadge.className += 'priority-medium';
-                } else {
-                    priorityBadge.className += 'priority-low';
-                }
-                
-                // Set status
-                const statusElement = document.getElementById('detailStatus');
-                statusElement.textContent = props.status;
-                
-                // Format dates
-                const startDate = task.start ? new Date(task.start) : new Date();
-                const dueDate = task.end ? new Date(task.end) : new Date(task.start);
-                
-                document.getElementById('detailStartDate').textContent = startDate.toLocaleDateString();
-                document.getElementById('detailDueDate').textContent = dueDate.toLocaleDateString();
-                
-                // Set assignees
-                const assigneesElement = document.getElementById('detailAssignees');
-                assigneesElement.innerHTML = '';
-                
-                if (props.assignees && props.assignees.length > 0) {
-                    const assigneeNames = props.assignees.map(user => user.name).join(', ');
-                    assigneesElement.textContent = assigneeNames;
-                } else {
-                    assigneesElement.textContent = 'No assignees';
-                }
-                
-                // Set progress
-                const progressBar = document.getElementById('detailProgress');
-                const progressText = document.getElementById('progressText');
-                if(props.status && props.status.toLowerCase() === 'completed') {
-                    progressBar.style.width = '100%';
-                    progressBar.textContent = 'Completed';
-                    progressBar.className = 'progress-bar bg-success';
-                    progressText.textContent = 'Task completed';
-                } else if(props.status && props.status.toLowerCase() === 'in_progress') {
-                    progressBar.style.width = '60%';
-                    progressBar.textContent = 'In Progress';
-                    progressBar.className = 'progress-bar bg-warning';
-                    progressText.textContent = 'Task in progress - completion submitted';
-                } else {
-                    progressBar.style.width = '30%';
-                    progressBar.textContent = 'Pending';
-                    progressBar.className = 'progress-bar bg-info';
-                    progressText.textContent = 'Task pending';
-                }
-                
-                // Load attachments
-                const attachmentsList = document.getElementById('attachmentsList');
-                attachmentsList.innerHTML = '';
-                
-                if (props.attachments && props.attachments.length > 0) {
-                    props.attachments.forEach(attachment => {
-                        const fileLink = document.createElement('a');
-                        fileLink.href = `/storage/${attachment.path}`;
-                        fileLink.target = '_blank';
-                        fileLink.className = 'list-group-item list-group-item-action';
-                        
-                        const fileIcon = getFileIcon(attachment.type);
-                        const uploadDate = new Date(attachment.created_at).toLocaleDateString();
-                        
-                        fileLink.innerHTML = `
-                            <div class="d-flex w-100 justify-content-between">
-                                <div>
-                                    <i class="${fileIcon} me-2"></i>
-                                    ${attachment.filename}
-                                </div>
-                                <small>${uploadDate}</small>
-                            </div>
-                            <div class="d-flex w-100 justify-content-between">
-                                <small class="text-muted">${formatFileSize(attachment.size)}</small>
-                                <small>Uploaded by: ${attachment.uploaded_by.name}</small>
-                            </div>
-                        `;
-                        
-                        attachmentsList.appendChild(fileLink);
-                    });
-                } else {
-                    const noAttachments = document.createElement('div');
-                    noAttachments.className = 'list-group-item';
-                    noAttachments.textContent = 'No attachments yet';
-                    attachmentsList.appendChild(noAttachments);
-                }
-                
-                // Load comments - Fixed Implementation
-                const commentsList = document.getElementById('commentsList');
-                commentsList.innerHTML = '';
-                
-                if (props.comments && props.comments.length > 0) {
-                    props.comments.forEach(comment => {
-                        const commentElement = document.createElement('div');
-                        commentElement.className = 'card mb-2';
-                        commentElement.innerHTML = `
-                            <div class="card-body p-2">
-                                <div class="d-flex justify-content-between">
-                                    <strong>${comment.user.name}</strong>
-                                    <small class="text-muted">${new Date(comment.created_at).toLocaleString()}</small>
-                                </div>
-                                <p class="mb-0 mt-1">${comment.comment}</p>
-                            </div>
-                        `;
-                        commentsList.appendChild(commentElement);
-                    });
-                } else {
-                    const noComments = document.createElement('div');
-                    noComments.className = 'alert alert-info';
-                    noComments.textContent = 'No comments yet';
-                    commentsList.appendChild(noComments);
-                }
-                
-                // Show modal
-                const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
-                modal.show();
-            }
-        });
-        
-        calendar.render();
-        
-        // Navigation buttons
-        document.getElementById('prevWeek').addEventListener('click', function() {
-            calendar.prev();
-        });
-        
-        document.getElementById('today').addEventListener('click', function() {
-            calendar.today();
-        });
-        
-        document.getElementById('nextWeek').addEventListener('click', function() {
-            calendar.next();
-        });
-    }
-    
-    // Fixed Comment Submission
-    document.getElementById('commentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const taskId = document.getElementById('commentTaskId').value;
-        
-        fetch(`/tasks/${taskId}/comments`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Clear the comment field
-                document.getElementById('newComment').value = '';
-                
-                // Refresh the calendar to show new comment
-                const calendarEl = document.getElementById('taskCalendar');
-                const calendar = FullCalendar.getCalendar(calendarEl);
-                calendar.refetchEvents();
-                
-                // Show success message
-                alert('Comment added successfully');
-            }
-        })
-        .catch(error => {
-            console.error('Error adding comment:', error);
-            alert('Error adding comment. Please try again.');
-        });
-    });
-    
-    // File Attachment Submission
-    document.getElementById('attachmentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const taskId = document.getElementById('attachmentTaskId').value;
-        
-        fetch(`/tasks/${taskId}/attachments`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Clear the file input
-                document.getElementById('newAttachment').value = '';
-                
-                // Refresh the calendar to show new attachment
-                const calendarEl = document.getElementById('taskCalendar');
-                const calendar = FullCalendar.getCalendar(calendarEl);
-                calendar.refetchEvents();
-                
-                // Show success message
-                alert('Files uploaded successfully');
-            }
-        })
-        .catch(error => {
-            console.error('Error uploading files:', error);
-            alert('Error uploading files. Please try again.');
-        });
-    });
-    
-    // Toggle sidebar on mobile
-    document.getElementById('sidebarToggle').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('mainContent').classList.toggle('active');
-    });
-    
-    // Helper functions
-    function getFileIcon(mimeType) {
-        if (!mimeType) return 'fas fa-file';
-        
-        if (mimeType.startsWith('image/')) {
-            return 'fas fa-file-image';
-        } else if (mimeType === 'application/pdf') {
-            return 'fas fa-file-pdf';
-        } else if (mimeType.startsWith('video/')) {
-            return 'fas fa-file-video';
-        } else if (mimeType.startsWith('audio/')) {
-            return 'fas fa-file-audio';
-        } else if (mimeType.startsWith('application/vnd.ms-excel') || mimeType.includes('spreadsheetml')) {
-            return 'fas fa-file-excel';
-        } else if (mimeType.startsWith('application/msword') || mimeType.includes('wordprocessingml')) {
-            return 'fas fa-file-word';
-        } else if (mimeType.startsWith('application/zip') || mimeType.includes('compressed')) {
-            return 'fas fa-file-archive';
-        } else {
-            return 'fas fa-file';
+    <style>
+        /* Calendar Event Styling */
+        .fc-event {
+            cursor: pointer;
+            border-radius: 4px;
+            border-left: 4px solid #3a87ad;
+            padding: 2px 5px;
+            margin-bottom: 2px;
+            font-size: 0.85em;
         }
-    }
-    
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-});
-</script>
+
+        .priority-badge {
+            padding: 0.35em 0.65em;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .priority-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        /* Status-specific event styling */
+        .fc-event-completed {
+            opacity: 0.7;
+            border-left: 4px solid #28a745 !important;
+        }
+
+        .fc-event-overdue {
+            border-left: 4px solid #dc3545 !important;
+        }
+
+        .fc-event-in-progress {
+            border-left: 4px solid #ffc107 !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize the task modal
+            const taskModal = new TaskModal();
+
+            // Get tasks from server via AJAX
+            fetch('{{ route("api.tasks") }}')
+                .then(response => response.json())
+                .then(data => {
+                    initializeCalendar(data);
+                })
+                .catch(error => {
+                    console.error('Error loading tasks:', error);
+                    alert('Error loading tasks. Please refresh the page.');
+                });
+
+            function initializeCalendar(taskData) {
+                const calendarEl = document.getElementById('taskCalendar');
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: taskData.map(task => ({
+                        id: task.id,
+                        title: task.title,
+                        start: task.due_date,
+                        end: task.due_date,
+                        allDay: true,
+                        className: `fc-event-${task.priority.name.toLowerCase()}-priority ${getStatusClass(task.status)}`,
+                        extendedProps: {
+                            description: task.description,
+                            priority: task.priority,
+                            status: task.status || 'pending',
+                            creator: task.creator,
+                            assignees: task.users || [],
+                            attachments: task.attachments || [],
+                            comments: task.comments || [],
+                            task_id: task.id,
+                            is_participant: task.is_participant
+                        }
+                    })),
+                    dateClick: function (info) {
+                        // Get all tasks for the clicked date
+                        const tasksOnDate = taskData.filter(task => {
+                            const taskDate = new Date(task.due_date).toDateString();
+                            const clickedDate = info.date.toDateString();
+                            return taskDate === clickedDate;
+                        });
+
+                        if (tasksOnDate.length > 0) {
+                            // Show the first task in the modal (you could implement a list view if needed)
+                            taskModal.showTaskLoadingState();
+                            taskModal.loadTaskDetails(tasksOnDate[0].id);
+                            document.getElementById('submission_task_id').value = tasksOnDate[0].id;
+                            taskModal.modal.show();
+                        } else {
+                            // No tasks on this date
+                            alert('No tasks scheduled for ' + info.dateStr);
+                        }
+                    },
+                    eventClick: function (info) {
+                        // Show the clicked task in the modal
+                        const task = info.event;
+                        taskModal.showTaskLoadingState();
+                        taskModal.loadTaskDetails(task.extendedProps.task_id);
+                        document.getElementById('submission_task_id').value = task.extendedProps.task_id;
+                        taskModal.modal.show();
+                    }
+                });
+
+                calendar.render();
+
+                // Navigation buttons
+                document.getElementById('prevWeek').addEventListener('click', function () {
+                    calendar.prev();
+                });
+
+                document.getElementById('today').addEventListener('click', function () {
+                    calendar.today();
+                });
+
+                document.getElementById('nextWeek').addEventListener('click', function () {
+                    calendar.next();
+                });
+            }
+
+            // Helper function to get status class
+            function getStatusClass(status) {
+                if (!status) return 'fc-event-pending';
+
+                switch (status.toLowerCase()) {
+                    case 'completed': return 'fc-event-completed';
+                    case 'overdue': return 'fc-event-overdue';
+                    case 'in_progress':
+                    case 'in progress':
+                        return 'fc-event-in-progress';
+                    default: return 'fc-event-pending';
+                }
+            }
+
+            // Toggle sidebar on mobile
+            document.getElementById('sidebarToggle').addEventListener('click', function () {
+                document.getElementById('sidebar').classList.toggle('active');
+                document.getElementById('mainContent').classList.toggle('active');
+            });
+
+        });
+    </script>
+    <script>
+        class TaskModal {
+            constructor() {
+                this.modal = new bootstrap.Modal(document.getElementById('taskViewModal'));
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                // Event delegation for view task buttons
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.view-task-btn')) {
+                        const button = e.target.closest('.view-task-btn');
+                        const taskId = button.getAttribute('data-task-id');
+                        this.showTaskLoadingState();
+                        this.loadTaskDetails(taskId);
+                        document.getElementById('submission_task_id').value = taskId;
+                        this.modal.show();
+                    }
+                });
+
+                // Sort functionality
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) {
+                    sortSelect.addEventListener('change', function () {
+                        TaskModal.sortTasks(this.value);
+                    });
+                }
+            }
+
+            showTaskLoadingState() {
+                document.getElementById('task-loading-indicator').style.display = 'block';
+                document.getElementById('task-details-container').style.display = 'none';
+                document.getElementById('task-error-container').style.display = 'none';
+            }
+
+            showTaskDetails() {
+                document.getElementById('task-loading-indicator').style.display = 'none';
+                document.getElementById('task-details-container').style.display = 'block';
+                document.getElementById('task-error-container').style.display = 'none';
+            }
+
+            showTaskError(errorMessage) {
+                document.getElementById('task-loading-indicator').style.display = 'none';
+                document.getElementById('task-details-container').style.display = 'none';
+                document.getElementById('task-error-container').style.display = 'block';
+                document.getElementById('task-error-message').textContent = errorMessage || 'Failed to load task details.';
+            }
+
+            loadTaskDetails(taskId) {
+                fetch(`/tasks/${taskId}/details`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data.success) {
+                            throw new Error(data.message || 'Failed to load task details');
+                        }
+
+                        const task = data.data;
+
+                        // Populate basic task info
+                        document.getElementById('task-modal-title').textContent = task.title;
+                        document.getElementById('task-modal-description').textContent = task.description;
+                        document.getElementById('task-modal-status').textContent = task.status;
+                        document.getElementById('task-modal-status').className = `badge rounded-pill bg-${this.getStatusClass(task.status)}`;
+
+                        // Hide submission form if task is completed
+                        const submissionForm = document.getElementById('task-submission-form-container');
+                        if (task.status.toLowerCase() === 'completed') {
+                            submissionForm.style.display = 'none';
+                        } else {
+                            submissionForm.style.display = 'block';
+                        }
+
+                        if (task.priority) {
+                            document.getElementById('task-modal-priority').textContent = task.priority.name;
+                            document.getElementById('task-modal-priority').className = `badge rounded-pill bg-${this.getPriorityClass(task.priority.name)}`;
+                        } else {
+                            document.getElementById('task-modal-priority').textContent = 'No Priority';
+                            document.getElementById('task-modal-priority').className = 'badge rounded-pill bg-secondary';
+                        }
+
+                        document.getElementById('task-modal-due-date').textContent = `Due: ${task.due_date_formatted}`;
+                        document.getElementById('task-modal-creator').textContent = task.creator.name;
+                        document.getElementById('task-modal-created-at').textContent = task.created_at_formatted;
+
+                        // Load attachments
+                        const attachmentsContainer = document.getElementById('task-modal-attachments');
+                        attachmentsContainer.innerHTML = '';
+                        if (task.attachments && task.attachments.length > 0) {
+                            task.attachments.forEach(attachment => {
+                                const attachmentElement = document.createElement('div');
+                                attachmentElement.className = 'mb-2';
+
+                                if (attachment.mime_type && attachment.mime_type.startsWith('image/')) {
+                                    attachmentElement.innerHTML = `
+                                    <a href="/storage/${attachment.url}" target="_blank" class="d-block">
+                                        <img src="/storage/${attachment.url}" class="attachment-thumbnail" 
+                                             alt="${attachment.original_name}" title="${attachment.original_name}">
+                                    </a>
+                                    <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
+                                `;
+                                } else {
+                                    attachmentElement.innerHTML = `
+                                    <a href="/storage/${attachment.url}" target="_blank" class="d-block text-center">
+                                        <div class="attachment-thumbnail d-flex align-items-center justify-content-center bg-white">
+                                            <i class="fas fa-file-alt fa-2x text-secondary"></i>
+                                        </div>
+                                        <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
+                                    </a>
+                                `;
+                                }
+
+                                attachmentsContainer.appendChild(attachmentElement);
+                            });
+                        } else {
+                            attachmentsContainer.innerHTML = '<p class="text-muted">No attachments</p>';
+                        }
+
+                        // Load comments
+                        const commentsContainer = document.getElementById('task-modal-comments');
+                        commentsContainer.innerHTML = '';
+                        if (task.comments && task.comments.length > 0) {
+                            task.comments.forEach(comment => {
+                                const commentElement = document.createElement('div');
+                                commentElement.className = 'comment-item';
+                                commentElement.innerHTML = `
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="${comment.user.avatar_url || '/storage/profile/avatars/profile.png'}" 
+                                         class="user-avatar" alt="${comment.user.name}">
+                                    <div>
+                                        <span class="comment-user">${comment.user.name}</span>
+                                        <span class="comment-time">${comment.created_at}</span>
+                                    </div>
+                                </div>
+                                <p class="ms-4 mb-0">${comment.content}</p>
+                            `;
+                                commentsContainer.appendChild(commentElement);
+                            });
+                        } else {
+                            commentsContainer.innerHTML = '<p class="text-muted">No comments yet</p>';
+                        }
+
+                        this.showTaskDetails();
+                    })
+                    .catch(error => {
+                        console.error('Error loading task details:', error);
+                        this.showTaskError(error.message || 'Failed to load task details. Please try again.');
+                    });
+            }
+
+            getStatusClass(status) {
+                const statusClasses = {
+                    'pending': 'info',
+                    'in_progress': 'warning',
+                    'completed': 'success',
+                    'overdue': 'danger',
+                    'rejected': 'danger',
+                    'pending_approval': 'primary'
+                };
+                return statusClasses[status.toLowerCase()] || 'secondary';
+            }
+
+            getPriorityClass(priority) {
+                const priorityClasses = {
+                    'high': 'danger',
+                    'medium': 'warning',
+                    'low': 'success'
+                };
+                return priorityClasses[priority.toLowerCase()] || 'secondary';
+            }
+
+            static sortTasks(criteria) {
+                // Get all tab panes
+                const tabPanes = document.querySelectorAll('.tab-pane');
+
+                tabPanes.forEach(tabPane => {
+                    const taskContainer = tabPane;
+                    const tasks = Array.from(taskContainer.querySelectorAll('.task-card'));
+
+                    tasks.sort((a, b) => {
+                        if (criteria === 'due_date') {
+                            return new Date(a.getAttribute('data-due-date')) - new Date(b.getAttribute('data-due-date'));
+                        } else if (criteria === 'priority') {
+                            const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3, '': 4 };
+                            return priorityOrder[a.getAttribute('data-priority') || ''] - priorityOrder[b.getAttribute('data-priority') || ''];
+                        } else if (criteria === 'status') {
+                            return a.getAttribute('data-status').localeCompare(b.getAttribute('data-status'));
+                        }
+                        return 0;
+                    });
+
+                    // Re-append sorted tasks
+                    tasks.forEach(task => taskContainer.appendChild(task));
+                });
+            }
+        }
+
+        // Initialize the TaskModal when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-hide notification
+            const notification = document.querySelector('.notification-toast');
+            if (notification) {
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                }, 5000);
+            }
+
+            // Initialize task modal if it exists on the page
+            if (document.getElementById('taskViewModal')) {
+                new TaskModal();
+            }
+        });
+    </script>
 @endsection

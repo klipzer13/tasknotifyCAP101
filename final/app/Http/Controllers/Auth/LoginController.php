@@ -28,7 +28,16 @@ class LoginController extends Controller
     protected function redirectTo()
     {
         if (\Illuminate\Support\Facades\Auth::check()) {
-            $roleId = \Illuminate\Support\Facades\Auth::user()->role->id ?? null;
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $roleId = $user->role->id ?? null;
+
+            // Log the user login with time and date
+            \Illuminate\Support\Facades\Log::info('User logged in', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+
             switch ($roleId) {
                 case 1:
                     return '/admin/dashboard';
@@ -43,6 +52,7 @@ class LoginController extends Controller
 
         return '/home';
     }
+    
     
 
     /**

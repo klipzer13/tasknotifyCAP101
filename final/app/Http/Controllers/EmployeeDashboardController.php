@@ -18,7 +18,7 @@ class EmployeeDashboardController extends Controller
         // Get task statistics for the current user
         $activeTasks = Task::whereHas('users', function($query) {
             $query->where('user_id', Auth::id())
-                  ->whereNotIn('status_id', [3]); // Not completed (3 = completed)
+                  ->whereNotIn('status_id', [4]); // Not completed (3 = completed)
         })->count();
         
         // Overdue tasks
@@ -31,11 +31,12 @@ class EmployeeDashboardController extends Controller
         // Completed tasks (this month)
         $completedTasks = Task::whereHas('users', function($query) {
             $query->where('user_id', Auth::id())
-                  ->where('status_id', 3); // 3 = Completed
+                  ->where('status_id',[4] ); // 3 = Completed
         })
-        ->whereMonth('due_date', now()->month)
+    
+        // ->whereMonth('due_date', now()->month)
         ->count();
-        
+    
         // Calculate completion percentage
         $totalAssignedTasks = $activeTasks + $completedTasks;
         $completedPercentage = $totalAssignedTasks > 0 ? round(($completedTasks / $totalAssignedTasks) * 100) : 0;

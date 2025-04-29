@@ -251,7 +251,7 @@
                 </ul>
             </div>
             @endif
-            <span class="badge rounded-pill {{ $statusClass }}">{{ $statusName }}</span>
+           
         </div>
     </div>
     
@@ -283,17 +283,6 @@
            class="btn btn-sm btn-outline-primary me-2">
             <i class="fas fa-eye me-1"></i> View Details
         </a>
-        @if($statusName !== 'Completed')
-            <button class="btn btn-sm btn-outline-success mark-complete" 
-                    data-task-id="{{ $task->id }}">
-                <i class="fas fa-check me-1"></i> Mark Complete
-            </button>
-        @else
-            <button class="btn btn-sm btn-outline-secondary reopen-task" 
-                    data-task-id="{{ $task->id }}">
-                <i class="fas fa-redo me-1"></i> Reopen
-            </button>
-        @endif
     </div>
 </div>
                     @empty
@@ -307,19 +296,21 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Team Members</h5>
+                    <h5 class="mb-0">Members</h5>
                 </div>
                 <div class="card-body">
                     @foreach($teamMembers as $member)
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="{{ $member->avatar_url?? 'https://via.placeholder.com/40' }}" 
-                                 alt="{{ $member->name }}" class="user-avatar me-3">
-                            <div>
-                                <h6 class="mb-0">{{ $member->name }}</h6>
-                                <small class="text-muted">{{ $member->role->name ?? 'Team Member' }}</small>
+                        @if($member->role_id !== 1)
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ $member->avatar_url ?? 'https://via.placeholder.com/40' }}" 
+                                     alt="{{ $member->name }}" class="user-avatar me-3">
+                                <div>
+                                    <h6 class="mb-0">{{ $member->name }}</h6>
+                                    <small class="text-muted">{{ $member->role->name ?? 'Team Member' }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill ms-auto">{{ $member->tasks_count }} Tasks</span>
                             </div>
-                            <span class="badge bg-primary rounded-pill ms-auto">{{ $member->tasks_count }} Tasks</span>
-                        </div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -333,9 +324,9 @@
                         style="background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); border: none;">
                         <i class="fas fa-plus me-2"></i>Create New Task
                     </a>
-                    <button class="btn btn-outline-primary w-100 mb-2">
+                    <a href="{{ route('task.members') }}" class="btn btn-outline-primary w-100 mb-2">
                         <i class="fas fa-user-plus me-2"></i>Add Team Member
-                    </button>
+                    </a>
                     <button class="btn btn-outline-primary w-100">
                         <i class="fas fa-project-diagram me-2"></i>New Project
                     </button>

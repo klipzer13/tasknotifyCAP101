@@ -983,8 +983,8 @@
             <!-- <li class="">
                 <a href="#"><i class="fas fa-cog"></i> Reports</a>
             </li> -->
-            <li class="{{ request()->routeIs('task.report') ? 'active' : '' }}">
-                <a href="#"><i class="fas fa-cog"></i> Reports</a>
+            <li class="{{ request()->routeIs('chairperson.setting') ? 'active' : '' }}">
+                <a href="{{ route('chairperson.setting') }}"><i class="fas fa-cog"></i> Setting</a>
             </li>
             <li class="{{ request()->routeIs('task.document') ? 'active' : '' }}">
                 <a href="{{ route('task.document') }}"><i class="fas fa-file-alt"></i> Documents</a>

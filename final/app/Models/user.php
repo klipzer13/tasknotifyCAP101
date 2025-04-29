@@ -79,8 +79,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Task::class, 'task_user', 'user_id', 'task_id');
     }
-    
 
-    
+    public function getRoleNameAttribute()
+    {
+        return $this->role?->name;
+    }
+
 
 }

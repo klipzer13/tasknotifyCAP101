@@ -5,7 +5,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Top Navigation -->
-        <div class="top-nav d-flex justify-content-between align-items-center mb-4">
+        <!-- <div class="top-nav d-flex justify-content-between align-items-center mb-4">
             <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -20,7 +20,7 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Dashboard Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">

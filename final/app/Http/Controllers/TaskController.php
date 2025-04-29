@@ -13,6 +13,7 @@ use App\Models\TaskComment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TaskAssignedMail;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -66,7 +67,7 @@ class TaskController extends Controller
                   ->orWhere('description', 'like', '%' . $request->search . '%');
             });
         }
-
+        
         $tasks = $query->paginate(10);
         return view('admin.alltask', compact('tasks', 'statuses', 'priorities', 'users'));
     }
@@ -147,19 +148,14 @@ class TaskController extends Controller
             Mail::to($assignee->email)->send(new TaskAssignedMail($task, $assignee));
         }
 
+        Log::info('Task created', [
+            'task_title' => $task->title,
+            'created_by' => 'name ' . Auth::user()->name . ' ID ' . Auth::id(),
+            
+            'assignees' => User::whereIn('id', $validated['assignees'])->pluck('name')->toArray(),
+        ]);
+
         return back()->with('success', 'Task has been assigned successfully!');
-    }
-
-    public function markComplete(Task $task)
-    {
-        $task->users()->updateExistingPivot(Auth::id(), ['status_id' => 3]);
-        return response()->json(['success' => true]);
-    }
-
-    public function reopen(Task $task)
-    {
-        $task->users()->updateExistingPivot(Auth::id(), ['status_id' => 1]);
-        return response()->json(['success' => true]);
     }
 
     public function dash()
@@ -202,11 +198,6 @@ class TaskController extends Controller
     {
         $documents = Attachment::where('type', 'application/pdf')->get();
         return view('admin.documents', compact('documents'));
-    }
-
-    public function reports()
-    {
-        return view('admin.reports');
     }
     
     public function addComment(Request $request, $taskId)
@@ -258,55 +249,4 @@ class TaskController extends Controller
         ]);
     }
     
-    public function submitCompletion(Request $request, $taskId)
-    {
-        $request->validate([
-            'comments' => 'nullable|string|max:1000',
-            'completion_attachments.*' => 'nullable|file|max:10240'
-        ]);
-        
-        if ($request->has('comments')) {
-            TaskComment::create([
-                'task_id' => $taskId,
-                'user_id' => Auth::id(),
-                'comment' => $request->comments
-            ]);
-        }
-        
-        if ($request->hasFile('completion_attachments')) {
-            foreach ($request->file('completion_attachments') as $file) {
-                $path = $file->store('completion_attachments', 'public');
-                
-                Attachment::create([
-                    'task_id' => $taskId,
-                    'filename' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'type' => $file->getMimeType(),
-                    'size' => $file->getSize(),
-                    'uploaded_by' => Auth::id(),
-                    'is_completion_doc' => true
-                ]);
-            }
-        }
-        
-        $task = Task::findOrFail($taskId);
-        $inProgressStatus = Status::where('name', 'in_progress')->first()->id;
-        $task->users()->updateExistingPivot(Auth::id(), ['status_id' => $inProgressStatus]);
-        
-        return response()->json(['success' => true]);
-    }
-    
-    public function updateStatus(Request $request, $taskId)
-    {
-        if (Auth::user()->role_id != 2) {
-            abort(403, 'Unauthorized action.');
-        }
-        
-        $task = Task::findOrFail($taskId);
-        $status = Status::where('name', $request->action === 'complete' ? 'completed' : 'pending')->first();
-        
-        $task->users()->update(['status_id' => $status->id]);
-        
-        return response()->json(['success' => true]);
-    }
 }

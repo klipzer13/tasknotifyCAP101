@@ -210,6 +210,18 @@
             background-color: #e3f2fd;
             color: #1976d2;
         }
+        .status-approved {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        .status-rejected {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        .status-pending_approval {
+            background-color: #f3e5f5;
+            color: #8e24aa;
+        }
 
         .status-in-progress {
             background-color: #fff3e0;

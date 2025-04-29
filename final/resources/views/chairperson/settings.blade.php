@@ -1,4 +1,4 @@
-@extends('genview')
+@extends('chairperson.genchair')
 @section('title', 'Profile Settings')
 
 @section('content')
@@ -284,7 +284,7 @@
                     <span class="notification-badge">3</span>
                 </div>
                 <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" alt="User Profile" class="rounded-circle"
+                    <img src="{{ Auth::user()->avatar ? asset(  Auth::user()->avatar) : asset('storage/profile/avatars/profile.png') }}" alt="User Profile" class="rounded-circle"
                         width="40">
                     <span>{{ ucwords(strtolower(Auth::user()->name)) }}</span>
                 </div>
@@ -321,7 +321,7 @@
                     <div class="profile-card">
                         <div class="profile-header">
                             <div class="avatar-upload">
-                                <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" class="profile-avatar" alt="Profile Avatar" id="avatarPreview">
+                                <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('storage/profile/avatars/profile.png') }}" class="profile-avatar" alt="Profile Avatar" id="avatarPreview">
                                 <label class="btn" for="avatarInput">
                                     <i class="fas fa-camera"></i>
                                     <input type="file" id="avatarInput" accept="image/*" style="display: none;">
@@ -331,45 +331,47 @@
                                 <h3>{{ Auth::user()->name }}</h3>
                                 <p>Chairperson</p>
                                 <p><i class="fas fa-envelope me-2"></i> {{ Auth::user()->email }}</p>
+                                <p><i class="fas fa-user me-2"></i> {{ Auth::user()->username }}</p>
                             </div>
                         </div>
 
-                        <form id="profileForm">
+                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
+                            @csrf
+                            @method('PUT')
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="firstName" class="form-label">First Name</label>
-                                    <input type="text" class="form-control" id="firstName" value="{{ explode(' ', Auth::user()->name)[0] }}">
+                                    <label for="name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->name }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="lastName" class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" id="lastName" value="{{ explode(' ', Auth::user()->name)[1] ?? '' }}">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" value="{{ Auth::user()->username }}">
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="email" value="{{ Auth::user()->email }}">
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" placeholder="+1 (___) ___-____">
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ Auth::user()->phone }}">
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="department" class="form-label">Department</label>
-                                <select class="form-select" id="department">
-                                    <option>Executive</option>
-                                    <option>Finance</option>
-                                    <option>Operations</option>
-                                    <option>Human Resources</option>
+                            <!-- <div class="mb-3">
+                                <label for="department_id" class="form-label">Department</label>
+                                <select class="form-select" id="department_id" name="department_id">
+                                    @foreach($departments as $department)
+                                        <option value="{{ $department->id }}" {{ Auth::user()->department_id == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
+                                    @endforeach
                                 </select>
-                            </div>
+                            </div> -->
 
                             <div class="mb-3">
-                                <label for="bio" class="form-label">Bio</label>
-                                <textarea class="form-control" id="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                                <label for="avatar" class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" id="avatar" name="avatar">
                             </div>
 
                             <div class="text-end">
@@ -386,19 +388,24 @@
                     <div class="profile-card">
                         <div class="security-alert">
                             <i class="fas fa-shield-alt me-2"></i>
-                            <strong>Security Alert:</strong> Last password change was 3 months ago. Consider updating your password regularly.
+                            <strong>Security Alert:</strong> Last password change was {{ Auth::user()->updated_at->diffForHumans() }}. Consider updating your password regularly.
                         </div>
 
                         <h5 class="mb-4">Change Password</h5>
-                        <form id="passwordForm">
+                        <form action="{{ route('profile.password') }}" method="POST" id="passwordForm">
+                            @csrf
+                            @method('PUT')
                             <div class="mb-3">
-                                <label for="currentPassword" class="form-label">Current Password</label>
-                                <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+                                <label for="current_password" class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Enter current password">
+                                @error('current_password')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-3">
-                                <label for="newPassword" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                                <label for="password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password">
                                 <div class="password-strength">
                                     <div class="password-strength-bar" id="passwordStrengthBar"></div>
                                 </div>
@@ -412,11 +419,14 @@
                                         <li class="invalid" id="specialReq">One special character</li>
                                     </ul>
                                 </div>
+                                @error('password')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
-                                <label for="confirmPassword" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                                <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm new password">
                                 <div class="invalid-feedback" id="passwordMatchError" style="display: none;">
                                     Passwords do not match
                                 </div>
@@ -428,42 +438,6 @@
                                 </button>
                             </div>
                         </form>
-
-                        <hr class="my-4">
-
-                        <h5 class="mb-4">Two-Factor Authentication</h5>
-                        <div class="notification-item">
-                            <div>
-                                <div class="notification-label">SMS Authentication</div>
-                                <div class="notification-description">Receive verification codes via SMS</div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="notification-item">
-                            <div>
-                                <div class="notification-label">Authenticator App</div>
-                                <div class="notification-description">Use an authenticator app for verification codes</div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="notification-item">
-                            <div>
-                                <div class="notification-label">Email Verification</div>
-                                <div class="notification-description">Receive verification codes via email</div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -472,119 +446,123 @@
                     <div class="profile-card">
                         <h5 class="mb-4">Notification Preferences</h5>
 
-                        <div class="mb-4">
-                            <h6 class="mb-3">Task Notifications</h6>
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">New Task Assignments</div>
-                                    <div class="notification-description">When you're assigned to a new task</div>
+                        <form action="{{ route('profile.notifications') }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-4">
+                                <h6 class="mb-3">Task Notifications</h6>
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">New Task Assignments</div>
+                                        <div class="notification-description">When you're assigned to a new task</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[task_assigned]" value="1" {{ Auth::user()->notification_preferences['task_assigned'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
+
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Task Updates</div>
+                                        <div class="notification-description">When tasks you're assigned to are updated</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[task_updated]" value="1" {{ Auth::user()->notification_preferences['task_updated'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Approval Requests</div>
+                                        <div class="notification-description">When team members request your approval</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[approval_requested]" value="1" {{ Auth::user()->notification_preferences['approval_requested'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Task Updates</div>
-                                    <div class="notification-description">When tasks you're assigned to are updated</div>
+                            <div class="mb-4">
+                                <h6 class="mb-3">Reminder Preferences</h6>
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Due Date Reminders</div>
+                                        <div class="notification-description">Remind me before tasks are due</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[due_date_reminder]" value="1" {{ Auth::user()->notification_preferences['due_date_reminder'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
+
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Daily Digest</div>
+                                        <div class="notification-description">Summary of tasks and updates</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[daily_digest]" value="1" {{ Auth::user()->notification_preferences['daily_digest'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Weekly Reports</div>
+                                        <div class="notification-description">Weekly summary of team progress</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notifications[weekly_report]" value="1" {{ Auth::user()->notification_preferences['weekly_report'] ?? false ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Approval Requests</div>
-                                    <div class="notification-description">When team members request your approval</div>
+                            <div class="mb-4">
+                                <h6 class="mb-3">Notification Methods</h6>
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Email Notifications</div>
+                                        <div class="notification-description">Receive notifications via email</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notification_methods[email]" value="1" {{ Auth::user()->notification_methods['email'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
 
-                        <div class="mb-4">
-                            <h6 class="mb-3">Reminder Preferences</h6>
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Due Date Reminders</div>
-                                    <div class="notification-description">Remind me before tasks are due</div>
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">Push Notifications</div>
+                                        <div class="notification-description">Receive notifications on your devices</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notification_methods[push]" value="1" {{ Auth::user()->notification_methods['push'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
 
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Daily Digest</div>
-                                    <div class="notification-description">Summary of tasks and updates</div>
+                                <div class="notification-item">
+                                    <div>
+                                        <div class="notification-label">In-App Notifications</div>
+                                        <div class="notification-description">Show notifications within the application</div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" name="notification_methods[in_app]" value="1" {{ Auth::user()->notification_methods['in_app'] ?? true ? 'checked' : '' }}>
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Weekly Reports</div>
-                                    <div class="notification-description">Weekly summary of team progress</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <h6 class="mb-3">Notification Methods</h6>
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Email Notifications</div>
-                                    <div class="notification-description">Receive notifications via email</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
                             </div>
 
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">Push Notifications</div>
-                                    <div class="notification-description">Receive notifications on your devices</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-save">
+                                    <i class="fas fa-save me-2"></i> Save Preferences
+                                </button>
                             </div>
-
-                            <div class="notification-item">
-                                <div>
-                                    <div class="notification-label">In-App Notifications</div>
-                                    <div class="notification-description">Show notifications within the application</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="text-end">
-                            <button type="button" class="btn btn-save">
-                                <i class="fas fa-save me-2"></i> Save Preferences
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -620,7 +598,7 @@
             }
 
             // Password strength checker
-            const newPassword = document.getElementById('newPassword');
+            const newPassword = document.getElementById('password');
             if (newPassword) {
                 newPassword.addEventListener('input', function() {
                     const password = this.value;
@@ -663,7 +641,7 @@
             }
 
             // Password match checker
-            const confirmPassword = document.getElementById('confirmPassword');
+            const confirmPassword = document.getElementById('password_confirmation');
             if (confirmPassword) {
                 confirmPassword.addEventListener('input', function() {
                     const passwordMatchError = document.getElementById('passwordMatchError');

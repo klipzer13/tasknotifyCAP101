@@ -259,7 +259,7 @@
                                             </button>
                                         </div>
                                         @foreach($department->users as $user)
-                                            @if($user->id !== Auth::id())
+                                            @if($user->id !== Auth::id() && $user->role->name !== 'Admin')
                                                 <div class="user-select-item" onclick="toggleUserSelection(this, '{{ $user->id }}')"
                                                     data-department="department-{{ $department->id }}">
                                                     <img src="{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"

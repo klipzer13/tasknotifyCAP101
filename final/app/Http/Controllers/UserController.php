@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Department;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -20,7 +22,6 @@ class UserController extends Controller
 
         return view('admin.members', compact('users', 'roles', 'departments'));
     }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,7 +44,12 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        // Log who is creating and who is being created
+        $createdBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
+        $createdUser = $user->name . ' (ID: ' . $user->id . ')';
+        Log::info("User '{$createdBy}' created user '{$createdUser}'.");
 
         return response()->json(['success' => true, 'message' => 'User created successfully']);
     }
@@ -97,6 +103,11 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        // Log who is updating and who is being updated
+        $updatedBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
+        $updatedUser = $user->name . ' (ID: ' . $user->id . ')';
+        Log::info("User '{$updatedBy}' updated user '{$updatedUser}'.");
+
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
     }
 
@@ -104,6 +115,11 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        // Log who is deleting and who is being deleted
+        $deletedBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
+        $deletedUser = $user->name . ' (ID: ' . $user->id . ')';
+        Log::info("User '{$deletedBy}' deleted user '{$deletedUser}'.");
+
         // Don't delete the avatar if it's the default one
         if ($user->avatar && $user->avatar !== 'storage/profile/avatars/profile.png') {
             Storage::delete(str_replace('storage/', 'public/', $user->avatar));
@@ -112,5 +128,21 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+    }
+    public function redirec()
+    {
+        $user = Auth::user();
+        $roleId = $user->role->id ?? null;
+
+        switch ($roleId) {
+            case 1:
+                return redirect('/admin/dashboard');
+            case 2:
+                return redirect('/chairperson/dashboard');
+            case 3:
+                return redirect('/employee/dashboard');
+            default:
+                return redirect('/home');
+        }
     }
 }

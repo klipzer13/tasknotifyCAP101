@@ -23,11 +23,11 @@ class DatabaseSeeder extends Seeder
         Priority::create(['name' => 'low', 'color' => '#06d6a0']);
 
         $statuses = [
-            ['name' => 'pending'],
-            ['name' => 'in_progress'],
-            ['name' => 'pending_approval'],
-            ['name' => 'completed'],
-            ['name' => 'rejected'],
+            ['name' => 'pending', 'color' => '#f39c12'],
+            ['name' => 'in_progress', 'color' => '#3498db'],
+            ['name' => 'pending_approval', 'color' => '#9b59b6'],
+            ['name' => 'completed', 'color' => '#2ecc71'],
+            ['name' => 'rejected', 'color' => '#e74c3c'],
         ];
 
         foreach ($statuses as $status) {

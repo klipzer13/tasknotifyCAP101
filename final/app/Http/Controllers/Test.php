@@ -8,11 +8,11 @@ class Test extends Controller
 {
     function index()
     {
-        return view('chairperson.commmentanddiscussion');
+        return view('chairperson.reports');
     }
     function test()
     {
-        return view('employee.dashboard');
+        return view('chairperson.settings');
     }
     function test2()
     {
