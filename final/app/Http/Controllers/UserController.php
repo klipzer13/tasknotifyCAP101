@@ -11,29 +11,64 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserCreated;
+use App\Mail\WelcomeToTaskNotify;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with(['role', 'department'])->paginate(10);
+        $authUserId = Auth::id();
+        $users = User::with(['role', 'department'])
+            ->where('id', '!=', $authUserId)
+            ->paginate(10);
         $roles = Role::all();
         $departments = Department::all();
 
         return view('admin.members', compact('users', 'roles', 'departments'));
     }
+    public function viewpassword()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'You must be logged in to change your password.');
+        }
+        return view('change-password', compact('user'));
+    }
+
+    public function updatePassword(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->password = Hash::make($validated['password']);
+        $user->default_password = 0;
+        $user->save();
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully',
+            'role_id' => $user->role->id // Add this line
+        ]);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
+            'name' => 'nullable|string|max:255',
+            'username' => 'nullable|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
-            'password' => 'required|string|min:8',
-            'role_id' => 'required|exists:roles,id',
-            'department_id' => 'required|exists:departments,id',
+            'password' => 'nullable|string|min:8',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+        $validated['role_id'] = 3;
+        $validated['department_id'] = 1;
+
+        $validated['password'] = Str::random(10);
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('profile/avatars', 'public');
@@ -43,13 +78,16 @@ class UserController extends Controller
         }
 
         $validated['password'] = Hash::make($validated['password']);
-
+        $passwordPlain = Str::random(10);
+        $validated['password'] = Hash::make($passwordPlain);
         $user = User::create($validated);
+        Mail::to($user->email)->queue(new WelcomeToTaskNotify($user, $passwordPlain));
+
 
         // Log who is creating and who is being created
-        $createdBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
-        $createdUser = $user->name . ' (ID: ' . $user->id . ')';
-        Log::info("User '{$createdBy}' created user '{$createdUser}'.");
+        // $createdBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
+        // $createdUser = $user->name . ' (ID: ' . $user->id . ')';
+        // Log::info("User '{$createdBy}' created user '{$createdUser}'.");
 
         return response()->json(['success' => true, 'message' => 'User created successfully']);
     }
@@ -80,8 +118,8 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8',
-            'role_id' => 'required|exists:roles,id',
-            'department_id' => 'required|exists:departments,id',
+            'role_id' => 'exists:roles,id',
+            'department_id' => 'exists:departments,id',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -115,34 +153,46 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // Log who is deleting and who is being deleted
-        $deletedBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
-        $deletedUser = $user->name . ' (ID: ' . $user->id . ')';
-        Log::info("User '{$deletedBy}' deleted user '{$deletedUser}'.");
 
-        // Don't delete the avatar if it's the default one
-        if ($user->avatar && $user->avatar !== 'storage/profile/avatars/profile.png') {
-            Storage::delete(str_replace('storage/', 'public/', $user->avatar));
-        }
+    }
+    public function status(Request $request, User $user)
+    {
 
-        $user->delete();
+        $validated = $request->validate([
+            'status' => 'required'
+        ]);
+        $oldStatus = $user->status;
+        $user->status = $validated['status'];
+        $user->update();
 
-        return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        // // Log who changed the status and what the change was
+        // $changedBy = Auth::check() ? Auth::user()->name . ' (ID: ' . Auth::user()->id . ')' : 'Unknown';
+        // Log::info("User '{$changedBy}' changed status of user '{$user->name} (ID: {$user->id})' from '{$oldStatus}' to '{$user->status}'.");
+
+        return response()->json(['success' => true, 'message' => 'User status updated test successfully']);
     }
     public function redirec()
     {
         $user = Auth::user();
-        $roleId = $user->role->id ?? null;
+        if (!$user) {
+            return redirect()->route('login');
+        } else {
+            $roleId = $user->role->id ?? null;
 
-        switch ($roleId) {
-            case 1:
-                return redirect('/admin/dashboard');
-            case 2:
-                return redirect('/chairperson/dashboard');
-            case 3:
-                return redirect('/employee/dashboard');
-            default:
-                return redirect('/home');
+            if ($user->default_password == 1) {
+                return redirect()->route('change-password');
+            } else {
+                switch ($roleId) {
+                    case 1:
+                        return redirect('/admin/dashboard');
+                    case 2:
+                        return redirect('/chairperson/dashboard');
+                    case 3:
+                        return redirect('/employee/dashboard');
+                    default:
+                        return redirect('/home');
+                }
+            }
         }
     }
 }

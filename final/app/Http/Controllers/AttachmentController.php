@@ -14,7 +14,16 @@ class AttachmentController extends Controller
     {
         $attachments = Attachment::with('uploader')->paginate(perPage: 12);
         $users = User::all(); // For share modal
+        
         return view('admin.documents', compact('attachments', 'users'));
+    }
+
+    public function indexc()
+    {
+        $attachments = Attachment::with('uploader')->paginate(perPage: 12);
+        $users = User::all(); // For share modal
+        
+        return view('chairperson.documents', compact('attachments', 'users'));
     }
 
     public function store(Request $request)

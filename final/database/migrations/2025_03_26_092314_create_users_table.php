@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('email')->unique();
-            $table->string('email_verification_token')->nullable();
-            $table->string('password');
-            $table->string('username')->unique();
-            $table->string('phone')->nullable();
-            $table->string('avatar')->nullable()->default('profile/avatar/profile.png');
-            
+            $table->string('name', 255)->nullable();
+            $table->string('email', 255)->unique();
+            $table->string('email_verification_token', 255)->nullable();
+            $table->string('password', 255);
+            $table->string('username', 50)->unique();
+            $table->string('phone', 15)->nullable();
+            $table->string('avatar', 255)->nullable()->default('profile/avatar/profile.png');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             // Foreign Keys
             $table->unsignedBigInteger('role_id'); 
             $table->unsignedBigInteger('department_id');
@@ -28,7 +28,7 @@ return new class extends Migration
             // Define foreign key constraints
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
-
+            $table->boolean('default_password')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

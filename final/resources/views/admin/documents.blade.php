@@ -1,682 +1,686 @@
-@php
-    if (!function_exists('formatFileSize')) {
-        function formatFileSize($bytes, $decimals = 2) {
-            if ($bytes === 0) return '0 Bytes';
-            $k = 1024;
-            $sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            $i = floor(log($bytes) / log($k));
-            return round($bytes / pow($k, $i), $decimals) . ' ' . $sizes[$i];
-        }
-    }
-@endphp
 @extends('genview')
 
 @section('title', 'Document Management')
 
 @section('content')
     <style>
-
-        /* Main Layout */
-        .documents-container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-            padding: 30px;
-            margin-bottom: 30px;
-            border: none;
+        /* Modern Color Scheme with Vibrant Accents */
+        :root {
+            --primary: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
         }
 
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* Main Container with Glass Morphism Effect */
+        .documents-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            animation: fadeIn 0.6s ease-out forwards;
+            transition: all 0.3s ease;
+        }
+
+        .documents-container:hover {
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Header with Floating Animation */
         .documents-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #e0e0e0;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
             margin-bottom: 30px;
-            cursor: pointer;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .documents-header h4 {
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .documents-header h4 i {
+            margin-right: 12px;
+            color: var(--primary);
+        }
+
+        /* Enhanced Search Box with Floating Effect */
+        .search-box {
+            position: relative;
+            width: 320px;
             transition: all 0.3s ease;
-            background-color: var(--light-bg);
         }
 
-        .upload-area:hover {
-            border-color: var(--primary-color);
-            background-color: rgba(67, 97, 238, 0.05);
-            transform: translateY(-2px);
+        .search-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.1);
         }
 
-        .upload-icon {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            opacity: 0.8;
+        .search-box .input-group-text {
+            background: var(--primary-light);
+            border: none;
+            color: var(--primary);
+            border-radius: 12px 0 0 12px !important;
         }
 
-        /* File Cards */
-        .file-card {
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+        .search-box .form-control {
+            border: none;
+            background: var(--primary-light);
+            padding: 14px 20px;
+            border-radius: 0 12px 12px 0 !important;
             transition: all 0.3s ease;
-            background-color: white;
         }
 
-        .file-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--card-shadow);
-            border-color: transparent;
+        .search-box .form-control:focus {
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+            background: white;
         }
 
-        /* File Type Badges */
-        .file-type-badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
+        /* Employee Avatar with Hover Effect */
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-right: 12px;
+        }
+
+        .employee-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Table Styles with Floating Rows */
+        .document-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 20px;
+        }
+
+        .document-table thead th {
+            background: var(--primary);
+            color: white;
+            padding: 18px 20px;
+            text-align: left;
             font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
             letter-spacing: 0.5px;
         }
 
-        .file-type-badge.pdf { background-color: #ffeeee; color: #f44336; }
-        .file-type-badge.doc { background-color: #e3f2fd; color: #2196f3; }
-        .file-type-badge.xls { background-color: #e8f5e9; color: #4caf50; }
-        .file-type-badge.img { background-color: #fff3e0; color: #ff9800; }
-        .file-type-badge.zip { background-color: #f3e5f5; color: #9c27b0; }
-        .file-type-badge.other { background-color: #f5f5f5; color: #607d8b; }
+        .document-table thead th:first-child {
+            border-top-left-radius: 14px;
+            border-bottom-left-radius: 14px;
+        }
 
-        /* Buttons */
-        .btn-soft {
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 500;
+        .document-table thead th:last-child {
+            border-top-right-radius: 14px;
+            border-bottom-right-radius: 14px;
+        }
+
+        .document-table tbody td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            vertical-align: middle;
+            background: white;
             transition: all 0.3s ease;
         }
 
-        .btn-soft-primary {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary-color);
-        }
-
-        .btn-soft-primary:hover {
-            background-color: rgba(67, 97, 238, 0.2);
-        }
-
-        /* Table Styles */
-        .file-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .file-table thead th {
-            background-color: var(--light-bg);
-            padding: 14px 20px;
-            text-align: left;
-            font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.03);
-        }
-
-        .file-table tbody td {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-            vertical-align: middle;
-        }
-
-        .file-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .file-table tbody tr:hover {
-            background-color: var(--light-bg);
-        }
-
-        /* Modal Styles */
-        .preview-modal .modal-content {
+        .document-table tbody tr {
+            opacity: 0;
+            animation: fadeIn 0.4s ease-out forwards;
             border-radius: 12px;
-            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 10px;
+        }
+
+        .document-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+        .document-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        .document-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+        .document-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+        .document-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+        .document-table tbody tr:nth-child(6) { animation-delay: 0.6s; }
+        .document-table tbody tr:nth-child(7) { animation-delay: 0.7s; }
+
+        .document-table tbody tr:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .document-table tbody tr:hover td {
+            background: var(--primary-light);
+        }
+
+        .document-table tbody td:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .document-table tbody td:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        /* Progress Bar Styles with Animation */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(233, 236, 239, 0.5);
+            border-radius: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.5) 50%,
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Enhanced Status Badges with Icons */
+        .status-badge {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-badge i {
+            margin-right: 6px;
+            font-size: 0.7rem;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-in-progress {
+            background-color: #cce5ff;
+            color: #004085;
+            animation: pulse 2s infinite;
+        }
+
+        /* Document Type Chips */
+        .document-type {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .document-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Floating Action Button with Ripple Effect */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 25px rgba(67, 97, 238, 0.3);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite, float 3s ease-in-out infinite;
             overflow: hidden;
         }
 
-        .preview-modal .modal-header {
-            background-color: var(--primary-color);
-            color: white;
-            border-bottom: none;
+        .fab:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 8px 30px rgba(67, 97, 238, 0.4);
+            animation: none;
         }
 
-        .preview-modal .modal-body {
-            padding: 0;
-            height: 70vh;
+        .fab .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
         }
 
-        .preview-modal .modal-footer {
-            background-color: #f8f9fa;
-            border-top: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* Responsive Table */
+        @media (max-width: 992px) {
+            .document-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
             .documents-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
-            .file-actions {
-                margin-top: 10px;
-                justify-content: flex-start;
+        }
+
+        @media (max-width: 768px) {
+            .document-table thead {
+                display: none;
             }
             
-            .upload-area {
-                padding: 30px 15px;
+            .document-table tbody tr {
+                display: block;
+                margin-bottom: 20px;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                animation: none !important;
+                opacity: 1 !important;
+            }
+            
+            .document-table tbody tr:hover {
+                transform: none;
+            }
+            
+            .document-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            }
+            
+            .document-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                margin-right: 15px;
+                color: var(--gray);
+                min-width: 120px;
+            }
+            
+            .documents-container {
+                padding: 20px;
             }
         }
 
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Additional Animations */
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
         }
 
-        .file-card {
-            animation: fadeIn 0.3s ease forwards;
+        .animate-delay-1 {
+            animation-delay: 0.2s;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+        .animate-delay-2 {
+            animation-delay: 0.4s;
         }
     </style>
-
-    <div class="main-content">
-        <!-- Top Navigation -->
-        <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-            <button class="sidebar-collapse-btn" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="notification-badge">3</span>
-                </div>
-                <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" 
-                         alt="User Profile" class="rounded-circle" width="40">
-                    <span>{{ ucwords(strtolower(Auth::user()->name)) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documents Container -->
+        <!-- Your existing top navigation code here -->
+        
+        <!-- Documents Container with Enhanced Glass Effect -->
         <div class="documents-container">
-            <!-- Documents Header -->
             <div class="documents-header">
-                <h4 class="mb-0">
-                    <i class="fas fa-folder-open me-2" style="color: var(--primary-color);"></i> 
-                    Document Management
-                </h4>
-                <button hidden="true" "btn btn-primary" id="uploadTrigger">
-                    <i class="fas fa-plus me-2"></i> Upload Files
-                </button>
-            </div>
-
-            <!-- Upload Area -->
-            <div class="upload-area" id="uploadArea" style="display: none;">
-                <form id="uploadForm" action="{{ route('attachments.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <h5 class="mb-2">Drag & Drop Files Here</h5>
-                    <p class="text-muted mb-4">or click to browse files</p>
-                    <input type="file" id="fileUpload" name="files[]" multiple style="display: none;">
-                    <input type="hidden" name="task_id" value="0">
-                    <button type="button" class="btn btn-soft btn-soft-primary"
-                        onclick="document.getElementById('fileUpload').click()">
-                        <i class="fas fa-folder-open me-2"></i> Select Files
-                    </button>
-                    <div id="fileList" class="mt-4"></div>
-                    <button type="submit" class="btn btn-primary mt-3" id="uploadSubmit" style="display: none;">
-                        <i class="fas fa-upload me-2"></i> Upload Now
-                    </button>
-                </form>
-            </div>
-
-            <!-- View Toggle -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary active" id="listViewBtn">
-                        <i class="fas fa-list me-2"></i> List View
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" id="gridViewBtn">
-                        <i class="fas fa-th-large me-2"></i> Grid View
-                    </button>
-                </div>
+                <h4><i class="fas fa-file-contract"></i> Document Management</h4>
                 <div class="search-box">
                     <div class="input-group">
-                        <span class="input-group-text bg-transparent"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Search documents..." id="searchInput">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search documents..." id="searchDocuments">
                     </div>
                 </div>
             </div>
 
-            <!-- Files Table (List View) -->
-            <div class="table-responsive" id="listView">
-                <table class="file-table">
+            <!-- Document Tracking Table with Floating Rows -->
+            <div class="table-responsive">
+                <table class="document-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Type</th>
+                            <th>Tracking No.</th>
+                            <th>Employee</th>
+                            <th>Department</th>
+                            <th>Document Type</th>
                             <th>Size</th>
-                            <th>Uploaded</th>
-                            <th>Uploaded by</th>
-                            <th>Actions</th>
+                            <th>Assigned</th>
+                            <th>Submitted</th>
+                            <th>Completion</th>
+                            <th>Progress</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($attachments as $attachment)
-                        <tr>
-                            <td>
-                                @php
-                                    $icon = match (true) {
-                                        str_contains($attachment->type, 'pdf') => 'fa-file-pdf text-danger',
-                                        str_contains($attachment->type, 'word') => 'fa-file-word text-primary',
-                                        str_contains($attachment->type, 'excel') => 'fa-file-excel text-success',
-                                        str_contains($attachment->type, 'image') => 'fa-file-image text-warning',
-                                        str_contains($attachment->type, 'zip') => 'fa-file-archive text-secondary',
-                                        default => 'fa-file-alt text-muted'
-                                    };
-                                    $badgeClass = match (true) {
-                                        str_contains($attachment->type, 'pdf') => 'pdf',
-                                        str_contains($attachment->type, 'word') => 'doc',
-                                        str_contains($attachment->type, 'excel') => 'xls',
-                                        str_contains($attachment->type, 'image') => 'img',
-                                        str_contains($attachment->type, 'zip') => 'zip',
-                                        default => 'other'
-                                    };
-                                @endphp
-                                <i class="fas {{ $icon }} me-2"></i>
-                                <span class="file-name">{{ $attachment->filename }}</span>
-                            </td>
-                            <td>
-                                <span class="file-type-badge {{ $badgeClass }}">
-                                    {{ strtoupper(pathinfo($attachment->filename, PATHINFO_EXTENSION)) }}
-                                </span>
-                            </td>
-                            <td>{{ formatFileSize($attachment->size) }}</td>
-                            <td>{{ $attachment->created_at->format('M d, Y') }}</td>
-                            <td>{{ $attachment->uploader->name }}</td>
-                            <td>
-                                <div class="d-flex">
-                                    <button class="btn btn-sm btn-soft btn-soft-primary view-btn me-2"
-                                        data-file-url="{{ Storage::url($attachment->path) }}"
-                                        data-file-type="{{ $attachment->type }}"
-                                        data-file-name="{{ $attachment->filename }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <a href="{{ route('attachments.download', $attachment->id) }}"
-                                        class="btn btn-sm btn-soft btn-soft-primary me-2">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                    <form action="{{ route('attachments.destroy', $attachment->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-soft btn-soft-primary me-2"
-                                            onclick="return confirm('Are you sure you want to delete this file?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
+                    <tbody id="documentTableBody">
+                        <!-- Sample data will be inserted here by JavaScript -->
                     </tbody>
                 </table>
             </div>
-
-            <!-- Files Grid (Hidden by default) -->
-            <div class="row" id="gridView" style="display: none;">
-                @foreach($attachments as $attachment)
-                @php
-                    $icon = match (true) {
-                        str_contains($attachment->type, 'pdf') => 'fa-file-pdf text-danger',
-                        str_contains($attachment->type, 'word') => 'fa-file-word text-primary',
-                        str_contains($attachment->type, 'excel') => 'fa-file-excel text-success',
-                        str_contains($attachment->type, 'image') => 'fa-file-image text-warning',
-                        str_contains($attachment->type, 'zip') => 'fa-file-archive text-secondary',
-                        default => 'fa-file-alt text-muted'
-                    };
-                    $badgeClass = match (true) {
-                        str_contains($attachment->type, 'pdf') => 'pdf',
-                        str_contains($attachment->type, 'word') => 'doc',
-                        str_contains($attachment->type, 'excel') => 'xls',
-                        str_contains($attachment->type, 'image') => 'img',
-                        str_contains($attachment->type, 'zip') => 'zip',
-                        default => 'other'
-                    };
-                @endphp
-                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                    <div class="file-card h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <i class="fas {{ $icon }}" style="font-size: 2.5rem;"></i>
-                            <span class="file-type-badge {{ $badgeClass }}">
-                                {{ strtoupper(pathinfo($attachment->filename, PATHINFO_EXTENSION)) }}
-                            </span>
-                        </div>
-                        <h6 class="mb-2 text-truncate" title="{{ $attachment->filename }}">{{ $attachment->filename }}</h6>
-                        <p class="small text-muted mb-3">{{ formatFileSize($attachment->size) }} • {{ $attachment->created_at->format('M d, Y') }}</p>
-                        <div class="file-actions d-flex justify-content-between">
-                            <button class="btn btn-sm btn-soft btn-soft-primary view-btn"
-                                data-file-url="{{ Storage::url($attachment->path) }}"
-                                data-file-type="{{ $attachment->type }}"
-                                data-file-name="{{ $attachment->filename }}">
-                                <i class="fas fa-eye me-1"></i> View
-                            </button>
-                            <a href="{{ route('attachments.download', $attachment->id) }}"
-                                class="btn btn-sm btn-soft btn-soft-primary">
-                                <i class="fas fa-download me-1"></i> Download
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            <!-- Pagination -->
-            @if($attachments->hasPages())
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    @if ($attachments->onFirstPage())
-                        <li class="page-item disabled">
-                            <span class="page-link"><i class="fas fa-angle-left"></i></span>
-                        </li>
-                    @else
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $attachments->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
-                        </li>
-                    @endif
-
-                    @foreach ($attachments->getUrlRange(1, $attachments->lastPage()) as $page => $url)
-                        @if ($page == $attachments->currentPage())
-                            <li class="page-item active">
-                                <span class="page-link">{{ $page }}</span>
-                            </li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                            </li>
-                        @endif
-                    @endforeach
-
-                    @if ($attachments->hasMorePages())
-                        <li class="page-item">
-                            <a class="page-link" href="{{ $attachments->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
-                        </li>
-                    @else
-                        <li class="page-item disabled">
-                            <span class="page-link"><i class="fas fa-angle-right"></i></span>
-                        </li>
-                    @endif
-                </ul>
-            </nav>
-            @endif
         </div>
-    </div>
 
-    <!-- File Preview Modal -->
-    <div class="modal fade preview-modal" id="filePreviewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="filePreviewModalLabel">File Preview</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="pdfPreview" style="display: none; height: 100%;">
-                        <iframe src="" width="100%" height="100%" style="border: none;"></iframe>
-                    </div>
-                    <div id="imagePreview" style="display: none; height: 100%; text-align: center;">
-                        <img src="" alt="Preview" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                    </div>
-                    <div id="officePreview" style="display: none; height: 100%;">
-                        <iframe src="" width="100%" height="100%" style="border: none;"></iframe>
-                    </div>
-                    <div id="unsupportedPreview" style="display: none; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;">
-                        <i class="fas fa-file-alt fa-5x text-muted mb-4"></i>
-                        <h4 class="mb-3">Preview Not Available</h4>
-                        <p class="text-muted mb-4">This file type cannot be previewed in the browser.</p>
-                        <a href="#" id="downloadInstead" class="btn btn-primary">
-                            <i class="fas fa-download me-2"></i> Download File
-                        </a>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a href="#" id="downloadBtn" class="btn btn-primary me-auto">
-                        <i class="fas fa-download me-2"></i> Download
-                    </a>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i> Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Floating Action Button with Ripple Effect -->
+      
 
     <script>
-        // Document ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle upload area
-            document.getElementById('uploadTrigger').addEventListener('click', function() {
-                const uploadArea = document.getElementById('uploadArea');
-                uploadArea.style.display = uploadArea.style.display === 'none' ? 'block' : 'none';
-            });
+        // Enhanced sample data with employee images and more details
+        const documentData = [
+            {
+                trackingNumber: 'DOC-2023-001',
+                employeeName: 'John Smith',
+                employeeImage: 'https://randomuser.me/api/portraits/men/32.jpg',
+                department: 'Marketing',
+                documentType: 'Annual Report',
+                documentSize: 1250,
+                assignedDocuments: 5,
+                submittedDocuments: 3,
+                status: 'in-progress',
+                dueDate: '2023-12-15'
+            },
+            {
+                trackingNumber: 'DOC-2023-002',
+                employeeName: 'Sarah Johnson',
+                employeeImage: 'https://randomuser.me/api/portraits/women/44.jpg',
+                department: 'Finance',
+                documentType: 'Budget Proposal',
+                documentSize: 850,
+                assignedDocuments: 3,
+                submittedDocuments: 3,
+                status: 'completed',
+                dueDate: '2023-11-30'
+            },
+            {
+                trackingNumber: 'DOC-2023-003',
+                employeeName: 'Michael Chen',
+                employeeImage: 'https://randomuser.me/api/portraits/men/75.jpg',
+                department: 'IT',
+                documentType: 'Security Audit',
+                documentSize: 3200,
+                assignedDocuments: 7,
+                submittedDocuments: 2,
+                status: 'pending',
+                dueDate: '2024-01-20'
+            },
+            {
+                trackingNumber: 'DOC-2023-004',
+                employeeName: 'Emily Wilson',
+                employeeImage: 'https://randomuser.me/api/portraits/women/68.jpg',
+                department: 'HR',
+                documentType: 'Employee Handbook',
+                documentSize: 1800,
+                assignedDocuments: 4,
+                submittedDocuments: 4,
+                status: 'completed',
+                dueDate: '2023-10-10'
+            },
+            {
+                trackingNumber: 'DOC-2023-005',
+                employeeName: 'David Rodriguez',
+                employeeImage: 'https://randomuser.me/api/portraits/men/81.jpg',
+                department: 'Operations',
+                documentType: 'Process Documentation',
+                documentSize: 950,
+                assignedDocuments: 6,
+                submittedDocuments: 1,
+                status: 'pending',
+                dueDate: '2024-02-05'
+            },
+            {
+                trackingNumber: 'DOC-2023-006',
+                employeeName: 'Lisa Thompson',
+                employeeImage: 'https://randomuser.me/api/portraits/women/63.jpg',
+                department: 'Sales',
+                documentType: 'Client Proposal',
+                documentSize: 2100,
+                assignedDocuments: 2,
+                submittedDocuments: 2,
+                status: 'completed',
+                dueDate: '2023-09-25'
+            },
+            {
+                trackingNumber: 'DOC-2023-007',
+                employeeName: 'Robert Kim',
+                employeeImage: 'https://randomuser.me/api/portraits/men/90.jpg',
+                department: 'Product',
+                documentType: 'Feature Spec',
+                documentSize: 1750,
+                assignedDocuments: 5,
+                submittedDocuments: 3,
+                status: 'in-progress',
+                dueDate: '2023-12-30'
+            }
+        ];
 
-            // File upload handling
-            document.getElementById('fileUpload').addEventListener('change', function(e) {
-                const files = e.target.files;
-                const fileList = document.getElementById('fileList');
-                const uploadSubmit = document.getElementById('uploadSubmit');
+        // Format file size function
+        function formatFileSize(kb) {
+            if (kb < 1024) return kb + ' KB';
+            const mb = (kb / 1024).toFixed(1);
+            return mb + ' MB';
+        }
 
-                fileList.innerHTML = '';
+        // Calculate completion percentage with animation
+        function calculateCompletion(assigned, submitted) {
+            return Math.round((submitted / assigned) * 100);
+        }
 
-                if (files.length > 0) {
-                    uploadSubmit.style.display = 'inline-block';
-                    
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'd-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded';
-                        fileItem.innerHTML = `
-                            <div>
-                                <i class="fas fa-file-alt me-2"></i>
-                                <span>${file.name}</span>
-                            </div>
-                            <small class="text-muted">${formatFileSize(file.size)}</small>
-                        `;
-                        fileList.appendChild(fileItem);
-                    }
-                } else {
-                    uploadSubmit.style.display = 'none';
-                }
-            });
+        // Get status badge with icon
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'completed':
+                    return `<span class="status-badge status-completed">
+                                <i class="fas fa-check-circle"></i> Completed
+                            </span>`;
+                case 'pending':
+                    return `<span class="status-badge status-pending">
+                                <i class="fas fa-clock"></i> Pending
+                            </span>`;
+                case 'in-progress':
+                    return `<span class="status-badge status-in-progress">
+                                <i class="fas fa-spinner"></i> In Progress
+                            </span>`;
+                default:
+                    return '';
+            }
+        }
 
-            // Drag and drop functionality
-            const uploadArea = document.getElementById('uploadArea');
+        // Format due date
+        function formatDueDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        // Render the document table with animations
+        function renderDocumentTable(data) {
+            const tableBody = document.getElementById('documentTableBody');
+            tableBody.innerHTML = '';
             
-            ['dragover', 'dragenter'].forEach(event => {
-                uploadArea.addEventListener(event, (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = 'var(--primary-color)';
-                    uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
-                });
-            });
-
-            ['dragleave', 'dragend', 'drop'].forEach(event => {
-                uploadArea.addEventListener(event, (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#e0e0e0';
-                    uploadArea.style.backgroundColor = 'var(--light-bg)';
-                });
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    document.getElementById('fileUpload').files = files;
-                    const event = new Event('change');
-                    document.getElementById('fileUpload').dispatchEvent(event);
-                }
-            });
-
-            // View toggle
-            document.getElementById('listViewBtn').addEventListener('click', function() {
-                this.classList.add('active');
-                document.getElementById('gridViewBtn').classList.remove('active');
-                document.getElementById('listView').style.display = 'block';
-                document.getElementById('gridView').style.display = 'none';
-            });
-
-            document.getElementById('gridViewBtn').addEventListener('click', function() {
-                this.classList.add('active');
-                document.getElementById('listViewBtn').classList.remove('active');
-                document.getElementById('listView').style.display = 'none';
-                document.getElementById('gridView').style.display = 'flex';
-            });
-
-            // Search functionality
-            document.getElementById('searchInput').addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const viewType = document.getElementById('listViewBtn').classList.contains('active') ? 'list' : 'grid';
+            data.forEach((doc, index) => {
+                const completion = calculateCompletion(doc.assignedDocuments, doc.submittedDocuments);
+                const dueDate = formatDueDate(doc.dueDate);
                 
-                if (viewType === 'list') {
-                    const rows = document.querySelectorAll('.file-table tbody tr');
-                    rows.forEach(row => {
-                        const fileName = row.querySelector('.file-name').textContent.toLowerCase();
-                        row.style.display = fileName.includes(searchTerm) ? '' : 'none';
-                    });
-                } else {
-                    const cards = document.querySelectorAll('#gridView .file-card');
-                    cards.forEach(card => {
-                        const fileName = card.querySelector('h6').textContent.toLowerCase();
-                        card.parentElement.style.display = fileName.includes(searchTerm) ? '' : 'none';
-                    });
-                }
+                const row = document.createElement('tr');
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.innerHTML = `
+                    <td data-label="Tracking No.">
+                        <span class="fw-bold text-primary">${doc.trackingNumber}</span>
+                    </td>
+                    <td data-label="Employee">
+                        <div class="d-flex align-items-center">
+                            <img src="${doc.employeeImage}" alt="${doc.employeeName}" class="employee-avatar">
+                            <div>
+                                <div class="fw-semibold">${doc.employeeName}</div>
+                                <small class="text-muted">Due ${dueDate}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Department">
+                        <span class="badge bg-light text-dark">${doc.department}</span>
+                    </td>
+                    <td data-label="Document Type">
+                        <span class="document-type">${doc.documentType}</span>
+                    </td>
+                    <td data-label="Size">${formatFileSize(doc.documentSize)}</td>
+                    <td data-label="Assigned">${doc.assignedDocuments}</td>
+                    <td data-label="Submitted">${doc.submittedDocuments}</td>
+                    <td data-label="Completion">
+                        <div class="fw-bold ${completion === 100 ? 'text-success' : completion > 50 ? 'text-primary' : 'text-warning'}">
+                            ${completion}%
+                        </div>
+                    </td>
+                    <td data-label="Progress">
+                        ${getStatusBadge(doc.status)}
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${completion}%"></div>
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
             });
+        }
 
-            // File preview functionality
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const fileUrl = this.getAttribute('data-file-url');
-                    const fileType = this.getAttribute('data-file-type');
-                    const fileName = this.getAttribute('data-file-name');
-                    
-                    previewFile(fileUrl, fileType, fileName);
+        // Search functionality with debounce
+        let searchTimeout;
+        document.getElementById('searchDocuments').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value.toLowerCase();
+                const filteredData = documentData.filter(doc => 
+                    doc.trackingNumber.toLowerCase().includes(searchTerm) ||
+                    doc.employeeName.toLowerCase().includes(searchTerm) ||
+                    doc.department.toLowerCase().includes(searchTerm) ||
+                    doc.documentType.toLowerCase().includes(searchTerm)
+                );
+                
+                renderDocumentTable(filteredData);
+            }, 300);
+        });
+
+        
+        // Initialize the table when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDocumentTable(documentData);
+            
+            // Add hover effects to all progress bars
+            document.querySelectorAll('.progress-bar').forEach(bar => {
+                bar.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scaleY(1.3)';
                 });
-            });
-
-            // Form submission with progress
-            document.getElementById('uploadForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-                const uploadArea = document.getElementById('uploadArea');
-
-                axios.post(this.action, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    onUploadProgress: function(progressEvent) {
-                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        // You could add a progress bar here
-                        console.log(percentCompleted + '% uploaded');
-                    }
-                })
-                .then(response => {
-                    toastr.success('Files uploaded successfully!');
-                    uploadArea.style.display = 'none';
-                    window.location.reload();
-                })
-                .catch(error => {
-                    toastr.error('Error uploading files: ' + error.response.data.message);
+                
+                bar.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scaleY(1)';
                 });
             });
         });
 
-        // File preview function
-        function previewFile(fileUrl, fileType, fileName) {
-            const modal = new bootstrap.Modal(document.getElementById('filePreviewModal'));
-            const pdfPreview = document.getElementById('pdfPreview');
-            const imagePreview = document.getElementById('imagePreview');
-            const officePreview = document.getElementById('officePreview');
-            const unsupportedPreview = document.getElementById('unsupportedPreview');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const downloadInstead = document.getElementById('downloadInstead');
-            const modalTitle = document.getElementById('filePreviewModalLabel');
-
-            // Reset all previews
-            pdfPreview.style.display = 'none';
-            imagePreview.style.display = 'none';
-            officePreview.style.display = 'none';
-            unsupportedPreview.style.display = 'none';
-
-            // Set modal title
-            modalTitle.textContent = fileName;
-            
-            // Set download links
-            downloadBtn.href = fileUrl;
-            downloadInstead.href = fileUrl;
-
-            // Show appropriate preview based on file type
-            if (fileType.includes('pdf')) {
-                pdfPreview.style.display = 'block';
-                pdfPreview.querySelector('iframe').src = fileUrl;
-            } 
-            else if (fileType.includes('image')) {
-                imagePreview.style.display = 'block';
-                imagePreview.querySelector('img').src = fileUrl;
+        // Add animation to table rows on hover
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.closest('.document-table tbody tr')) {
+                const row = e.target.closest('tr');
+                row.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
             }
-            else if (fileType.includes('word') || fileType.includes('excel') || fileType.includes('powerpoint')) {
-                officePreview.style.display = 'block';
-                officePreview.querySelector('iframe').src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`;
-            }
-            else {
-                unsupportedPreview.style.display = 'flex';
-            }
+        });
 
-            modal.show();
-        }
-
-        // Helper function to format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
+        document.addEventListener('mouseout', function(e) {
+            if (e.target.closest('.document-table tbody tr')) {
+                const row = e.target.closest('tr');
+                row.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.03)';
+            }
+        });
     </script>
 @endsection
-

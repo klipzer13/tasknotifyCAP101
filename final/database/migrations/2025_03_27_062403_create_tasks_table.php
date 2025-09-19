@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('due_date');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('priority_id')->constrained();
+            $table->boolean('require_documents')->default(false);
             $table->timestamps();
         });
     }

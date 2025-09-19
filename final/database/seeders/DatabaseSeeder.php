@@ -18,16 +18,16 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // Priorities
-        Priority::create(['name' => 'high', 'color' => '#ff6b6b']);
-        Priority::create(['name' => 'medium', 'color' => '#ffd166']);
-        Priority::create(['name' => 'low', 'color' => '#06d6a0']);
+        Priority::create(['name' => 'high']);
+        Priority::create(['name' => 'medium']);
+        Priority::create(['name' => 'low']);
 
         $statuses = [
-            ['name' => 'pending', 'color' => '#f39c12'],
-            ['name' => 'in_progress', 'color' => '#3498db'],
-            ['name' => 'pending_approval', 'color' => '#9b59b6'],
-            ['name' => 'completed', 'color' => '#2ecc71'],
-            ['name' => 'rejected', 'color' => '#e74c3c'],
+            ['name' => 'pending'],
+            ['name' => 'in_progress'],
+            ['name' => 'pending_approval'],
+            ['name' => 'completed'],
+            ['name' => 'rejected'],
         ];
 
         foreach ($statuses as $status) {
@@ -43,10 +43,7 @@ class DatabaseSeeder extends Seeder
             \App\Models\Role::create($role);
         }
         $departments = [
-            ['name' => 'IT', 'description' => 'Information Technology'],
-            ['name' => 'HR', 'description' => 'Human Resources'],
-            ['name' => 'Finance', 'description' => 'Finance Department'],
-            ['name' => 'Marketing', 'description' => 'Marketing Team'],
+            ['name' => 'N/A', 'description' => 'Not Assigned'],
         ];
 
         foreach ($departments as $department) {
@@ -60,7 +57,8 @@ class DatabaseSeeder extends Seeder
             'role_id' => '1',
             'department_id' => '1',
             'phone' => '1234567890',
-            'avatar' => 'profile/avatar/profile.png'
+            'default_password' => 0,
+            'avatar' => 'storage/profile/avatars/profile.png'
         ]);
 
 

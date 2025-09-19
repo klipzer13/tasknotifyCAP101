@@ -1,4 +1,4 @@
-@extends('chairperson.genchair')
+--@extends('chairperson.genchair')
 @section('title', 'All Tasks')
 
 @section('content')
@@ -70,9 +70,9 @@
                                 <td>
                                     <div class="d-flex">
                                         @foreach($task->users as $user)
-                                            <img src="{{ $user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" 
-                                                 alt="{{ $user->name }}" 
-                                                 class="assignee" 
+                                            <img src="{{ $user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
+                                                 alt="{{ $user->name }}"
+                                                 class="assignee"
                                                  title="{{ $user->name }}"
                                                  data-bs-toggle="tooltip">
                                         @endforeach
@@ -81,8 +81,8 @@
                                 <td>{{ $task->department->name ?? 'N/A' }}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline-primary" 
-                                                data-bs-toggle="modal" 
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
                                                 data-bs-target="#taskDetailModal{{ $task->id }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -126,8 +126,8 @@
                                                             <div class="d-flex flex-wrap">
                                                                 @foreach($task->attachments as $attachment)
                                                                     <a href="{{ Storage::url($attachment->file_path) }}" target="_blank">
-                                                                        <img src="{{ Storage::url($attachment->file_path) }}" 
-                                                                             class="attachment-thumbnail" 
+                                                                        <img src="{{ Storage::url($attachment->file_path) }}"
+                                                                             class="attachment-thumbnail"
                                                                              alt="{{ $attachment->file_name }}"
                                                                              title="{{ $attachment->file_name }}">
                                                                     </a>
@@ -138,12 +138,12 @@
 
                                                     <div class="mb-4">
                                                         <h6>Comments ({{ $task->comments->count() }})</h6>
-                                                        
+
                                                         @foreach($task->comments as $comment)
                                                             <div class="comment-box">
                                                                 <div class="comment-header">
                                                                     <div class="comment-user">
-                                                                        <img src="{{ $comment->user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" 
+                                                                        <img src="{{ $comment->user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
                                                                              alt="{{ $comment->user->name }}">
                                                                         {{ $comment->user->name }}
                                                                     </div>
@@ -178,8 +178,8 @@
                                                                 <div class="d-flex flex-wrap mt-2">
                                                                     @foreach($task->users as $user)
                                                                         <div class="me-2 mb-2 d-flex align-items-center">
-                                                                            <img src="{{ $user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" 
-                                                                                 alt="{{ $user->name }}" 
+                                                                            <img src="{{ $user->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
+                                                                                 alt="{{ $user->name }}"
                                                                                  class="assignee me-1">
                                                                             <span>{{ $user->name }}</span>
                                                                         </div>
@@ -209,7 +209,7 @@
                                                                 <input type="hidden" name="user_id" value="{{ Auth::id() }}">
                                                                 <select class="form-select task-status-select" name="status_id" required>
                                                                     @foreach($status::all() as $status)
-                                                                        <option value="{{ $status->id }}" 
+                                                                        <option value="{{ $status->id }}"
                                                                                 {{ $task->users->find(Auth::id())->pivot->status_id == $status->id ? 'selected' : '' }}>
                                                                             {{ ucwords(str_replace('_', ' ', $status->name)) }}
                                                                         </option>
@@ -264,7 +264,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                
+
                 <div class="d-flex justify-content-center">
                     {{ $tasks->links() }}
                 </div>
@@ -334,9 +334,9 @@
                                         <hr>
                                         @foreach($user::where('id', '!=', Auth::id())->get() as $user)
                                             <div class="form-check mb-2">
-                                                <input class="form-check-input assignee-checkbox" type="checkbox" 
-                                                       id="assignee_{{ $user->id }}" 
-                                                       name="assignees[]" 
+                                                <input class="form-check-input assignee-checkbox" type="checkbox"
+                                                       id="assignee_{{ $user->id }}"
+                                                       name="assignees[]"
                                                        value="{{ $user->id }}">
                                                 <label class="form-check-label" for="assignee_{{ $user->id }}">
                                                     {{ $user->name }}

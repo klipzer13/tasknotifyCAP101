@@ -1,231 +1,213 @@
 @extends('genview')
 @section('title', 'Team Members')
-<style>
-    .modal-content {
-        border: none;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
 
-    .modal-header {
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #f0f0f0;
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #ced4da;
-    }
-
-    .profile-picture-container {
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-    }
-
-    .border-light {
-        border-color: #f0f0f0 !important;
-    }
-
-    .toggle-password {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-
-    .modal-content {
-        border: none;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #f0f0f0;
-    }
-
-    .section-title {
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-        color: #6c757d;
-    }
-
-    .detail-item {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 12px 15px;
-        height: 100%;
-        transition: all 0.2s ease;
-    }
-
-    .detail-item:hover {
-        background-color: #f0f0f0;
-    }
-
-    .detail-label {
-        display: block;
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin-bottom: 5px;
-    }
-
-    .detail-value {
-        display: block;
-        font-weight: 500;
-        color: #212529;
-    }
-
-    .member-details-section {
-        padding-left: 20px;
-    }
-
-    .edit-profile-btn {
-        border-radius: 6px;
-        padding: 8px 16px;
-    }
-
-    .border-light {
-        border-color: #f0f0f0 !important;
-    }
-
-    .profile-picture-container {
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-
-    .toggle-password {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-
-    .border-light {
-        border-color: #f0f0f0 !important;
-    }
-</style>
 @section('content')
-    <div class="main-content">
-        <!-- Top Navigation -->
-              <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-            <button class="sidebar-collapse-btn" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="notification-badge">3</span>
+    <style>
+        .modal-content {
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .profile-picture-container {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .border-light {
+            border-color: #f0f0f0 !important;
+        }
+
+        .toggle-password {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .modal-content {
+            border: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: #6c757d;
+        }
+
+        .detail-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 12px 15px;
+            height: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .detail-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .detail-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            display: block;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .member-details-section {
+            padding-left: 20px;
+        }
+
+        .edit-profile-btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+        }
+
+        .border-light {
+            border-color: #f0f0f0 !important;
+        }
+
+        .profile-picture-container {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-password {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .border-light {
+            border-color: #f0f0f0 !important;
+        }
+    </style>
+    <div class="members-container">
+        <!-- Members Header -->
+        <div class="members-header">
+            <h4><i class="fas fa-users me-2"></i> Team Members</h4>
+            <div class="d-flex">
+                <div class="search-member me-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Search members...">
                 </div>
-                <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}" alt="User Profile" class="rounded-circle"
-                        width="40">
-                    <span>{{ ucwords(strtolower(Auth::user()->name)) }}</span>
-                </div>
+                <button class="btn add-member-btn" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                    <i class="fas fa-user-plus me-2"></i> Add Member
+                </button>
             </div>
         </div>
 
-        <!-- Members Container -->
-        <div class="members-container">
-            <!-- Members Header -->
-            <div class="members-header">
-                <h4><i class="fas fa-users me-2"></i> Team Members</h4>
-                <div class="d-flex">
-                    <div class="search-member me-3">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" placeholder="Search members...">
-                    </div>
-                    <button class="btn add-member-btn" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                        <i class="fas fa-user-plus me-2"></i> Add Member
-                    </button>
-                </div>
-            </div>
-
-            <!-- Members Table -->
-            <div class="table-responsive">
-                <table class="members-table">
-                    <thead>
+        <!-- Members Table -->
+        <div class="table-responsive">
+            <table class="members-table">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($users as $user)
                         <tr>
-                            <th>Member</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Role</th>
-                            <th>Department</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($users as $user)
-                            <tr>
-                                <td>
-                                    <div class="member-info">
-                                        <img src="{{ asset($user->avatar) }}" class="member-avatar">
-                                        <div>
-                                            <h6 class="mb-0">{{ $user->name }}</h6>
-                                            <small class="text-muted">{{ $user->role->name }}</small>
-                                        </div>
+                            <td>
+                                <div class="member-info">
+                                    <img src="{{ asset($user->avatar) }}" class="member-avatar">
+                                    <div>
+                                        <h6 class="mb-0">{{ $user->name }}</h6>
+                                        <small class="text-muted">{{ $user->role->name }}</small>
                                     </div>
-                                </td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->phone ?? 'N/A' }}</td>
-                                <td>{{ $user->role->name }}</td>
-                                <td>{{ $user->department->name }}</td>
-                                <td>
-                                    <button class="btn btn-sm action-btn view" data-id="{{ $user->id }}" data-bs-toggle="modal"
-                                        data-bs-target="#viewMemberModal">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm action-btn edit" data-id="{{ $user->id }}" data-bs-toggle="modal"
-                                        data-bs-target="#editMemberModal">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm action-btn delete" data-id="{{ $user->id }}"
-                                        data-bs-toggle="modal" data-bs-target="#deleteMemberModal">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {{ $users->onEachSide(1)->links('pagination::bootstrap-4') }}
-                </ul>
-            </nav>
+                                </div>
+                            </td>
+                            <td>{{ $user->username }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone ?? 'N/A' }}</td>
+                            <td>{{ $user->role->name }}</td>
+                            <td>{{ $user->department->name }}</td>
+                            <td>{{ $user->status }}</td>
+                            <td>
+                                <button class="btn btn-sm action-btn view" data-id="{{ $user->id }}" data-bs-toggle="modal"
+                                    data-bs-target="#viewMemberModal">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm action-btn edit" data-id="{{ $user->id }}" data-bs-toggle="modal"
+                                    data-bs-target="#editMemberModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm action-btn status" data-id="{{ $user->id }}"
+                                    data-status="{{ $user->status }}" data-bs-toggle="modal"
+                                    data-bs-target="#updateStatusModal">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
 
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {{ $users->onEachSide(1)->links('pagination::bootstrap-4') }}
+            </ul>
+        </nav>
+    </div>
     <!-- Add Member Modal -->
     <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -282,40 +264,6 @@
                                         <div class="form-group">
                                             <label for="memberPhone" class="form-label">Phone</label>
                                             <input type="text" class="form-control" id="memberPhone" name="phone">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="memberPassword" class="form-label">Password</label>
-                                            <div class="input-group">
-                                                <input type="password" class="form-control" id="memberPassword"
-                                                    name="password" required>
-                                                <button class="btn btn-outline-secondary toggle-password" type="button">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="memberRole" class="form-label">Role</label>
-                                            <select class="form-select" id="memberRole" name="role_id" required>
-                                                <option value="">Select Role</option>
-                                                @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="memberDepartment" class="form-label">Department</label>
-                                            <select class="form-select" id="memberDepartment" name="department_id" required>
-                                                <option value="">Select Department</option>
-                                                @foreach($departments as $department)
-                                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                                @endforeach
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -420,8 +368,6 @@
     </div>
 
 
-
-    <!-- Edit Member Modal -->
     <!-- Edit Member Modal -->
     <div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -532,108 +478,6 @@
         </div>
     </div>
 
-
-    <!-- Delete Member Modal -->
-    <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-labelledby="deleteMemberModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content bg-white">
-                <div class="modal-header border-light">
-                    <h5 class="modal-title d-flex align-items-center text-dark" id="deleteMemberModalLabel">
-                        <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Confirm Deletion
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Left Column - Warning Icon -->
-                        <div class="col-md-4 text-center border-end border-light pe-4">
-                            <div class="delete-warning-container p-4">
-                                <div
-                                    class="delete-warning-icon bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                                    <i class="fas fa-trash-alt text-danger" style="font-size: 2.5rem;"></i>
-                                </div>
-                                <h5 class="text-danger">Warning!</h5>
-                                <p class="text-muted">This action cannot be undone</p>
-                            </div>
-                        </div>
-
-                        <!-- Right Column - Member Info -->
-                        <div class="col-md-8 ps-4">
-                            <div class="delete-confirmation-content">
-                                <p class="lead">Are you sure you want to delete this member?</p>
-                                <div class="member-info-card p-3 bg-light rounded">
-                                    <div class="d-flex align-items-center">
-                                        <img id="deleteMemberAvatar" src="" class="rounded-circle me-4" width="80"
-                                            height="80" alt="Member Avatar">
-                                        <div>
-                                            <h4 class="mb-1 text-dark" id="deleteMemberName"></h4>
-                                            <p class="mb-2 text-muted" id="deleteMemberRole"></p>
-                                            <p class="mb-0 text-muted small" id="deleteMemberEmail"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="alert alert-warning mt-3">
-                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                    All associated data will be permanently removed from the system.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="hidden" id="deleteMemberId">
-                </div>
-                <div class="modal-footer border-light">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="deleteMember()">
-                        <i class="fas fa-trash-alt me-1"></i> Confirm Delete
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .delete-warning-container {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .delete-warning-icon {
-            width: 100px;
-            height: 100px;
-        }
-
-        .member-info-card {
-            transition: all 0.2s ease;
-        }
-
-        .member-info-card:hover {
-            background-color: #f0f0f0 !important;
-        }
-
-        .modal-content {
-            border: none;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .modal-footer {
-            border-top: 1px solid #f0f0f0;
-        }
-
-        .border-light {
-            border-color: #f0f0f0 !important;
-        }
-    </style>
     <script>
         // Preview new avatar image before upload
         document.getElementById('editAvatar').addEventListener('change', function (e) {
@@ -693,18 +537,37 @@
         });
 
         // Add member function
+        // Add member function with loading indicator and timeout
         function addMember() {
             const form = document.getElementById('addMemberForm');
             const formData = new FormData(form);
 
-            fetch("{{ route('users.store') }}", {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
+            // Show loading alert
+            Swal.fire({
+                title: 'Adding Member',
+                text: 'Please wait while we add the new team member...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-            })
+            });
+
+            // Set a timeout for the request
+            const timeout = 30000; // 30 seconds
+
+            Promise.race([
+                fetch("{{ route('users.store') }}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                }),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), timeout)
+                )
+            ])
                 .then(response => {
                     if (!response.ok) {
                         return response.json().then(err => { throw err; });
@@ -712,16 +575,48 @@
                     return response.json();
                 })
                 .then(data => {
+                    // Close loading alert
+                    Swal.close();
+
                     if (data.success) {
-                        alert('Member added successfully!');
-                        window.location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Member added successfully!',
+                            confirmButtonColor: '#3085d6',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
+                        });
                     } else {
-                        alert('Error: ' + (data.message || 'Failed to add member'));
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error: ' + (data.message || 'Failed to add member'),
+                            confirmButtonColor: '#d33',
+                        });
                     }
                 })
                 .catch(error => {
+                    // Close loading alert
+                    Swal.close();
+
                     console.error('Error:', error);
-                    alert('An error occurred while adding the member: ' + (error.message || 'Unknown error'));
+                    let errorMessage = 'An error occurred while adding the member';
+
+                    if (error.message === 'Request timeout') {
+                        errorMessage = 'The request took too long. Please try again.';
+                    } else if (error.message) {
+                        errorMessage += ': ' + error.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                        confirmButtonColor: '#d33',
+                    });
                 });
         }
         // View member function - populate modal with data
@@ -862,36 +757,6 @@
             });
         });
 
-        // Delete member function
-        function deleteMember() {
-            const userId = document.getElementById('deleteMemberId').value;
 
-            fetch(`users/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw err; });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        alert('Member deleted successfully!');
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + (data.message || 'Failed to delete member'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the member: ' + (error.message || 'Unknown error'));
-                });
-        }
     </script>
 @endsection

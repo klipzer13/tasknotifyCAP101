@@ -3,9 +3,13 @@
 
 @section('content')
     <style>
+        /* Professional CSS Variables */
+
+
+        /* Professional Task Management Styles */
         .tasks-container {
             background-color: white;
-            border-radius: 16px;
+            border-radius: 12px;
             box-shadow: var(--card-shadow);
             padding: 30px;
             margin-bottom: 30px;
@@ -45,6 +49,7 @@
             padding: 12px 20px;
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
+            transition: var(--transition);
         }
 
         .task-tabs .nav-link.active {
@@ -57,7 +62,7 @@
             border-radius: 12px;
             border: 1px solid #eee;
             margin-bottom: 15px;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
 
         .task-card:hover {
@@ -200,14 +205,6 @@
             margin: 0 auto;
         }
 
-        .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            min-width: 300px;
-        }
-
         /* Improved Modal Styles */
         .task-modal .modal-dialog {
             max-width: 800px;
@@ -265,89 +262,513 @@
         }
 
         .task-modal .comment-item {
-            border-bottom: 1px solid #e9ecef;
-            padding-bottom: 1rem;
             margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .task-modal .comment-item:last-child {
-            border-bottom: none;
             margin-bottom: 0;
         }
 
-        .task-modal .comment-user {
-            font-weight: 600;
-            color: #212529;
+        .comment-bubble {
+            border-radius: 18px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            position: relative;
+            max-width: 80%;
+            word-wrap: break-word;
         }
 
-        .task-modal .comment-time {
-            font-size: 0.75rem;
+        .comment-bubble.own {
+            background-color: #e3ecff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .comment-bubble.other {
+            background-color: #f0f4ff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .comment-bubble.rejected {
+            background-color: #ffebee;
+            border-left: 3px solid #f44336;
+        }
+
+        .comment-user {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comment-bubble.own .comment-user {
+            color: #4361ee;
+        }
+
+        .comment-bubble.other .comment-user {
             color: #6c757d;
         }
 
-        .task-modal .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 0.75rem;
+        .comment-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
         }
 
-        .task-modal .attachment-thumbnail {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
+        .completion-stats {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        /* Professional Notification Styles */
+        .notification-dropdown {
+            width: 380px;
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .notification-item {
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background-color: #f8faff;
+            border-left-color: var(--primary-color);
+        }
+
+        .notification-item .flex-shrink-0 {
+            flex: 0 0 38px;
+        }
+
+        .notification-list {
+            scrollbar-width: thin;
+            scrollbar-color: #dee2e6 #f8f9fa;
+        }
+
+        .notification-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-list::-webkit-scrollbar-track {
+            background: #f8f9fa;
+        }
+
+        .notification-list::-webkit-scrollbar-thumb {
+            background-color: #dee2e6;
+            border-radius: 3px;
+        }
+
+        .mark-all-read:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background-color: var(--primary-color);
+            color: white;
             border-radius: 8px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #dee2e6;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .task-modal .attachment-thumbnail:hover {
-            transform: scale(1.05);
+        .toast.success {
+            background-color: var(--success-color);
         }
 
-        .task-modal .form-label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+        .toast.error {
+            background-color: var(--danger-color);
         }
 
-        .task-modal .btn-submit {
-            padding: 0.5rem 1.5rem;
-            font-weight: 500;
+        .toast.warning {
+            background-color: var(--warning-color);
+            color: #212529;
+        }
+
+        /* Document status specific styles */
+        .document-approved {
+            border-left: 4px solid var(--success-color) !important;
+        }
+
+        .document-rejected {
+            border-left: 4px solid var(--danger-color) !important;
+        }
+
+        .document-pending {
+            border-left: 4px solid var(--warning-color) !important;
+        }
+
+        .document-status-badge {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .rejection-reason {
+            background-color: #f8d7da;
+            border-left: 3px solid var(--danger-color);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .completion-progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .comment-input-container {
+            position: relative;
+            margin-top: 15px;
+        }
+
+        .comment-submit-btn {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            border: none;
+            background: transparent;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .comment-submit-btn:hover {
+            color: var(--primary-hover);
+        }
+
+        .submission-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+
+        .document-status {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .rejection-reason-box {
+            background-color: #fff3f3;
+            border-left: 3px solid #ff6b6b;
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .task-count-badge {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.25em 0.5em;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tasks-container {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .task-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .task-meta span {
+                margin-right: 0;
+            }
+
+            .notification-dropdown {
+                width: 300px;
+                margin-right: -50px;
+            }
         }
     </style>
 
-
     <div class="main-content" id="mainContent">
+
         <!-- Top Navigation -->
-        <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-            <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="notification-badge">3</span>
+        <nav class="top-navbar navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2 px-3 mb-4 sticky-top">
+            <div class="container-fluid d-flex justify-content-between align-items-center p-0">
+                <!-- Left side - Toggle button and Brand -->
+                <div class="d-flex align-items-center">
+                    <!-- Hamburger menu - only visible on mobile -->
+                    <button class="sidebar-collapse-btn btn btn-link text-dark p-0 me-2 me-md-3 d-lg-none"
+                        id="sidebarToggle">
+                        <i class="fas fa-bars fs-4"></i>
+                    </button>
+                    <span class="navbar-brand fw-bold text-primary ms-1 ms-md-2" id="adminGreeting">Good Morning</span>
                 </div>
-                <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? 'https://via.placeholder.com/40' }}" alt="User"
-                        class="rounded-circle">
-                    <span>{{ Auth::user()->name }}</span>
+
+                <!-- Right side - Navigation and User Info -->
+                <div class="d-flex align-items-center">
+                    <!-- Notification and User Profile -->
+                    <div class="d-flex align-items-center ms-2 ms-lg-0">
+                        <!-- Notification -->
+                        <div class="dropdown position-relative me-2 me-lg-3">
+                            <button class="btn btn-link text-dark p-0 position-relative dropdown-toggle"
+                                id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                aria-label="Notifications">
+                                <i class="fas fa-bell fs-5"></i>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    id="notificationBadge">
+                                    3
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                                aria-labelledby="notificationDropdown">
+                                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+                                    <h6 class="m-0 fw-bold">Notifications</h6>
+                                    <div>
+                                        <span class="badge bg-primary rounded-pill me-2" id="notificationCount">3</span>
+                                        <button class="btn btn-sm btn-link text-muted p-0 mark-all-read"
+                                            title="Mark all as read">
+                                            <i class="fas fa-check-double"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Sample notification items -->
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item unread">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-user-check text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">Task Assigned</h6>
+                                                <small class="text-muted">2 min ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">You've been assigned a new task: "Website
+                                                Redesign".</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-primary bg-opacity-10 text-primary small fw-normal">Task</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item unread">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-warning bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">Task Deadline Approaching</h6>
+                                                <small class="text-muted">1 hour ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">"Client Proposal" task is due in 2 days.</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-warning bg-opacity-10 text-warning small fw-normal">Deadline</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-success bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">Task Completed</h6>
+                                                <small class="text-muted">3 hours ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">Your "Monthly Report" task was approved.</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-success bg-opacity-10 text-success small fw-normal">Approval</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="text-center py-3 bg-light border-top">
+                                        <a href="#" class="text-primary fw-semibold small">View All Notifications</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Profile -->
+                        <div class="d-flex align-items-center ms-2 ms-lg-3 border-start ps-2 ps-lg-3">
+                            <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
+                                alt="User Profile" class="rounded-circle me-2 border border-2 border-primary" width="40"
+                                height="40">
+                            <div class="d-none d-md-inline">
+                                <div class="fw-bold text-dark">{{ ucwords(strtolower(Auth::user()->name)) }}</div>
+                                <div class="small text-muted">Employee</div>
+                            </div>
+                            <!-- Show only name on small screens -->
+                            <div class="d-inline d-md-none">
+                                <div class="fw-bold text-dark">
+                                    {{ explode(' ', ucwords(strtolower(Auth::user()->name)))[0] }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        @if(session('success'))
-            <div class="notification-toast alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
+        </nav>
+        <script>
+            // Function to update greeting based on time of day
+            function updateGreeting() {
+                const greetingElement = document.getElementById('adminGreeting');
+                const hour = new Date().getHours();
+                let greeting;
 
+                if (hour < 12) {
+                    greeting = 'Good Morning';
+                } else if (hour < 18) {
+                    greeting = 'Good Afternoon';
+                } else {
+                    greeting = 'Good Evening';
+                }
 
+                greetingElement.textContent = `${greeting}`;
+            }
 
+            // Update greeting on page load and resize
+            document.addEventListener('DOMContentLoaded', function () {
+                updateGreeting();
+
+                // Notification functionality
+                const notificationDropdown = document.getElementById('notificationDropdown');
+                const notificationBadge = document.getElementById('notificationBadge');
+                const notificationCount = document.getElementById('notificationCount');
+                const markAllReadBtn = document.querySelector('.mark-all-read');
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                // Mark notifications as read when dropdown is shown
+                notificationDropdown.addEventListener('shown.bs.dropdown', function () {
+                    // Only mark as read if there are unread notifications
+                    if (parseInt(notificationBadge.textContent) > 0) {
+                        document.querySelectorAll('.notification-item.unread').forEach(item => {
+                            item.classList.remove('unread');
+                            item.style.borderLeftColor = 'transparent';
+                            item.style.backgroundColor = '';
+                        });
+
+                        // Update badge count to 0
+                        notificationBadge.textContent = '0';
+                        notificationCount.textContent = '0';
+                    }
+                });
+
+                // Mark all as read button
+                markAllReadBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.style.borderLeftColor = 'transparent';
+                        item.style.backgroundColor = '';
+                    });
+
+                    // Update badge count to 0
+                    notificationBadge.textContent = '0';
+                    notificationCount.textContent = '0';
+                });
+
+                // Sample function to add a new notification
+                function addNotification(title, message, type = 'info', category = 'General') {
+                    const icons = {
+                        'info': 'fa-info-circle',
+                        'warning': 'fa-exclamation-triangle',
+                        'success': 'fa-check-circle',
+                        'danger': 'fa-exclamation-circle',
+                        'user': 'fa-user'
+                    };
+
+                    const colors = {
+                        'info': 'primary',
+                        'warning': 'warning',
+                        'success': 'success',
+                        'danger': 'danger',
+                        'user': 'info'
+                    };
+
+                    const notificationList = document.querySelector('.notification-list');
+                    const newNotification = document.createElement('a');
+                    newNotification.href = '#';
+                    newNotification.className = 'dropdown-item d-flex py-3 px-3 notification-item unread';
+                    newNotification.innerHTML = `
+                                                                <div class="flex-shrink-0 me-3">
+                                                                    <div class="bg-${colors[type]} bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                                                        <i class="fas ${icons[type]} text-${colors[type]}"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex-grow-1">
+                                                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                        <h6 class="mb-0 fw-semibold">${title}</h6>
+                                                                        <small class="text-muted">just now</small>
+                                                                    </div>
+                                                                    <p class="mb-0 text-muted small">${message}</p>
+                                                                    <div class="mt-2">
+                                                                        <span class="badge bg-${colors[type]} bg-opacity-10 text-${colors[type]} small fw-normal">${category}</span>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+
+                    // Insert at the top of the list (before the "View All" link)
+                    const viewAllLink = notificationList.querySelector('.bg-light.border-top');
+                    notificationList.insertBefore(newNotification, viewAllLink);
+
+                    // Update badge count
+                    const currentCount = parseInt(notificationBadge.textContent) || 0;
+                    notificationBadge.textContent = currentCount + 1;
+                    notificationCount.textContent = currentCount + 1;
+
+                    // Add animation for new notification
+                    newNotification.style.opacity = '0';
+                    newNotification.style.transform = 'translateY(-10px)';
+                    newNotification.style.transition = 'all 0.3s ease';
+
+                    setTimeout(() => {
+                        newNotification.style.opacity = '1';
+                        newNotification.style.transform = 'translateY(0)';
+                    }, 10);
+                }
+
+                // Example: Add a new notification after 5 seconds
+                setTimeout(() => {
+                    addNotification('Task Update', 'Your submission for "Website Redesign" is under review.', 'info', 'Task');
+                }, 5000);
+            });
+
+            // Optional: Update greeting every minute in case page stays open for long
+            setInterval(updateGreeting, 60000);
+        </script>
         <!-- Tasks Content -->
         <div class="tasks-container">
 
@@ -372,7 +793,7 @@
                         type="button" role="tab">
                         <i class="fas fa-list-check me-2"></i>
                         <span>All Tasks</span>
-                        <span class="task-count-badge bg-primary-soft ms-2">{{ $tasks->count() }}</span>
+                        <span class="task-count-badge">{{ $tasks->count() }}</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -380,7 +801,7 @@
                         type="button" role="tab">
                         <i class="fas fa-clock me-2"></i>
                         <span>Current Task</span>
-                        <span class="task-count-badge bg-primary-soft ms-2">
+                        <span class="task-count-badge">
                             {{ $tasks->filter(function ($task) use ($statuses) {
         $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
         $status = $statuses->firstWhere('id', $userStatus);
@@ -394,7 +815,7 @@
                         type="button" role="tab">
                         <i class="fas fa-hourglass-half me-2"></i>
                         <span>Pending Approval</span>
-                        <span class="task-count-badge bg-primary-soft ms-2">
+                        <span class="task-count-badge">
                             {{ $tasks->filter(function ($task) use ($statuses) {
         $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
         $status = $statuses->firstWhere('id', $userStatus);
@@ -408,7 +829,7 @@
                         type="button" role="tab">
                         <i class="fas fa-check-circle me-2"></i>
                         <span>Completed</span>
-                        <span class="task-count-badge bg-primary-soft ms-2">
+                        <span class="task-count-badge">
                             {{ $tasks->filter(function ($task) use ($statuses) {
         $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
         $status = $statuses->firstWhere('id', $userStatus);
@@ -423,45 +844,45 @@
                 <!-- All Tasks Tab -->
                 <div class="tab-pane fade show active" id="all-tasks" role="tabpanel">
                     @if($tasks->count() > 0)
-                                @foreach($tasks as $task)
-                                            @php
-                                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
-                                                $status = $statuses->firstWhere('id', $userStatus);
-                                            @endphp
-                                            <div class="task-card" data-task-id="{{ $task->id }}"
-                                                data-due-date="{{ $task->due_date->format('Y-m-d') }}"
-                                                data-priority="{{ $task->priority ? $task->priority->name : '' }}"
-                                                data-status="{{ $status->name }}">
-                                                <div class="task-card-header">
-                                                    <div>
-                                                        <span class="task-title">{{ $task->title }}</span>
-                                                        @if($task->priority)
-                                                            <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
-                                                                {{ $task->priority->name }} Priority
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
-                                                        {{ $status->name }}
-                                                    </span>
-                                                </div>
-                                                <div class="task-card-body">
-                                                    <div class="task-meta">
-                                                        <span><i class="fas fa-calendar-alt"></i> Due:
-                                                            {{ $task->due_date->format('M d, Y') }}</span>
-                                                        <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
-                                                    </div>
-                                                    <p class="task-description">
-                                                        {{ $task->description }}
-                                                    </p>
-                                                    <div class="task-actions">
-                                                        <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
-                                                            <i class="fas fa-eye me-1"></i> View Details
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                @endforeach
+                        @foreach($tasks as $task)
+                            @php
+                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
+                                $status = $statuses->firstWhere('id', $userStatus);
+                            @endphp
+                            <div class="task-card" data-task-id="{{ $task->id }}"
+                                data-due-date="{{ $task->due_date->format('Y-m-d') }}"
+                                data-priority="{{ $task->priority ? $task->priority->name : '' }}"
+                                data-status="{{ $status->name }}">
+                                <div class="task-card-header">
+                                    <div>
+                                        <span class="task-title">{{ $task->title }}</span>
+                                        @if($task->priority)
+                                            <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
+                                                {{ $task->priority->name }} Priority
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
+                                        {{ $status->name }}
+                                    </span>
+                                </div>
+                                <div class="task-card-body">
+                                    <div class="task-meta">
+                                        <span><i class="fas fa-calendar-alt"></i> Due:
+                                            {{ $task->due_date->format('M d, Y') }}</span>
+                                        <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
+                                    </div>
+                                    <p class="task-description">
+                                        {{ $task->description }}
+                                    </p>
+                                    <div class="task-actions">
+                                        <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
+                                            <i class="fas fa-eye me-1"></i> View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     @else
                         <div class="empty-state">
                             <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
@@ -486,47 +907,47 @@
                     @endphp
 
                     @if($activeTasksExist)
-                                @foreach($tasks as $task)
-                                            @php
-                                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
-                                                $status = $statuses->firstWhere('id', $userStatus);
-                                            @endphp
-                                            @if(in_array($status->name, ['pending', 'in_progress', 'rejected']))
-                                                <div class="task-card" data-task-id="{{ $task->id }}"
-                                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
-                                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
-                                                    data-status="{{ $status->name }}">
-                                                    <div class="task-card-header">
-                                                        <div>
-                                                            <span class="task-title">{{ $task->title }}</span>
-                                                            @if($task->priority)
-                                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
-                                                                    {{ $task->priority->name }} Priority
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
-                                                            {{ $status->name }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="task-card-body">
-                                                        <div class="task-meta">
-                                                            <span><i class="fas fa-calendar-alt"></i> Due:
-                                                                {{ $task->due_date->format('M d, Y') }}</span>
-                                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
-                                                        </div>
-                                                        <p class="task-description">
-                                                            {{ $task->description }}
-                                                        </p>
-                                                        <div class="task-actions">
-                                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
-                                                                <i class="fas fa-eye me-1"></i> View Details
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        @foreach($tasks as $task)
+                            @php
+                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
+                                $status = $statuses->firstWhere('id', $userStatus);
+                            @endphp
+                            @if(in_array($status->name, ['pending', 'in_progress', 'rejected']))
+                                <div class="task-card" data-task-id="{{ $task->id }}"
+                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
+                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
+                                    data-status="{{ $status->name }}">
+                                    <div class="task-card-header">
+                                        <div>
+                                            <span class="task-title">{{ $task->title }}</span>
+                                            @if($task->priority)
+                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
+                                                    {{ $task->priority->name }} Priority
+                                                </span>
                                             @endif
-                                @endforeach
+                                        </div>
+                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
+                                            {{ $status->name }}
+                                        </span>
+                                    </div>
+                                    <div class="task-card-body">
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> Due:
+                                                {{ $task->due_date->format('M d, Y') }}</span>
+                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
+                                        </div>
+                                        <p class="task-description">
+                                            {{ $task->description }}
+                                        </p>
+                                        <div class="task-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     @else
                         <div class="empty-state">
                             <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
@@ -551,47 +972,47 @@
                     @endphp
 
                     @if($pendingTasksExist)
-                                @foreach($tasks as $task)
-                                            @php
-                                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
-                                                $status = $statuses->firstWhere('id', $userStatus);
-                                            @endphp
-                                            @if($status->name == 'pending_approval')
-                                                <div class="task-card" data-task-id="{{ $task->id }}"
-                                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
-                                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
-                                                    data-status="{{ $status->name }}">
-                                                    <div class="task-card-header">
-                                                        <div>
-                                                            <span class="task-title">{{ $task->title }}</span>
-                                                            @if($task->priority)
-                                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
-                                                                    {{ $task->priority->name }} Priority
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
-                                                            {{ $status->name }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="task-card-body">
-                                                        <div class="task-meta">
-                                                            <span><i class="fas fa-calendar-alt"></i> Due:
-                                                                {{ $task->due_date->format('M d, Y') }}</span>
-                                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
-                                                        </div>
-                                                        <p class="task-description">
-                                                            {{ $task->description }}
-                                                        </p>
-                                                        <div class="task-actions">
-                                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
-                                                                <i class="fas fa-eye me-1"></i> View Details
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        @foreach($tasks as $task)
+                            @php
+                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
+                                $status = $statuses->firstWhere('id', $userStatus);
+                            @endphp
+                            @if($status->name == 'pending_approval')
+                                <div class="task-card" data-task-id="{{ $task->id }}"
+                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
+                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
+                                    data-status="{{ $status->name }}">
+                                    <div class="task-card-header">
+                                        <div>
+                                            <span class="task-title">{{ $task->title }}</span>
+                                            @if($task->priority)
+                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
+                                                    {{ $task->priority->name }} Priority
+                                                </span>
                                             @endif
-                                @endforeach
+                                        </div>
+                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
+                                            {{ $status->name }}
+                                        </span>
+                                    </div>
+                                    <div class="task-card-body">
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> Due:
+                                                {{ $task->due_date->format('M d, Y') }}</span>
+                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
+                                        </div>
+                                        <p class="task-description">
+                                            {{ $task->description }}
+                                        </p>
+                                        <div class="task-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     @else
                         <div class="empty-state">
                             <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
@@ -616,47 +1037,47 @@
                     @endphp
 
                     @if($completedTasksExist)
-                                @foreach($tasks as $task)
-                                            @php
-                                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
-                                                $status = $statuses->firstWhere('id', $userStatus);
-                                            @endphp
-                                            @if($status->name == 'completed')
-                                                <div class="task-card" data-task-id="{{ $task->id }}"
-                                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
-                                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
-                                                    data-status="{{ $status->name }}">
-                                                    <div class="task-card-header">
-                                                        <div>
-                                                            <span class="task-title">{{ $task->title }}</span>
-                                                            @if($task->priority)
-                                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
-                                                                    {{ $task->priority->name }} Priority
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
-                                                            {{ $status->name }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="task-card-body">
-                                                        <div class="task-meta">
-                                                            <span><i class="fas fa-calendar-alt"></i> Due:
-                                                                {{ $task->due_date->format('M d, Y') }}</span>
-                                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
-                                                        </div>
-                                                        <p class="task-description">
-                                                            {{ $task->description }}
-                                                        </p>
-                                                        <div class="task-actions">
-                                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
-                                                                <i class="fas fa-eye me-1"></i> View Details
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                        @foreach($tasks as $task)
+                            @php
+                                $userStatus = $task->users->firstWhere('id', Auth::id())->pivot->status_id;
+                                $status = $statuses->firstWhere('id', $userStatus);
+                            @endphp
+                            @if($status->name == 'completed')
+                                <div class="task-card" data-task-id="{{ $task->id }}"
+                                    data-due-date="{{ $task->due_date->format('Y-m-d') }}"
+                                    data-priority="{{ $task->priority ? $task->priority->name : '' }}"
+                                    data-status="{{ $status->name }}">
+                                    <div class="task-card-header">
+                                        <div>
+                                            <span class="task-title">{{ $task->title }}</span>
+                                            @if($task->priority)
+                                                <span class="priority-badge priority-{{ strtolower($task->priority->name) }}">
+                                                    {{ $task->priority->name }} Priority
+                                                </span>
                                             @endif
-                                @endforeach
+                                        </div>
+                                        <span class="status-badge status-{{ str_replace(' ', '-', strtolower($status->name)) }}">
+                                            {{ $status->name }}
+                                        </span>
+                                    </div>
+                                    <div class="task-card-body">
+                                        <div class="task-meta">
+                                            <span><i class="fas fa-calendar-alt"></i> Due:
+                                                {{ $task->due_date->format('M d, Y') }}</span>
+                                            <span><i class="fas fa-user"></i> Assigned by: {{ $task->creator->name }}</span>
+                                        </div>
+                                        <p class="task-description">
+                                            {{ $task->description }}
+                                        </p>
+                                        <div class="task-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-task-btn" data-task-id="{{ $task->id }}">
+                                                <i class="fas fa-eye me-1"></i> View Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     @else
                         <div class="empty-state">
                             <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
@@ -669,8 +1090,6 @@
         </div>
     </div>
 
-    <!-- Task View Modal -->
-    <!-- Task View Modal -->
     <div class="modal fade task-modal" id="taskViewModal" tabindex="-1" aria-labelledby="taskViewModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -681,11 +1100,23 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
+                    <input type="hidden" id="submission_task_id" name="task_id" value="">
                     <div id="task-loading-indicator" class="text-center py-5">
                         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                         <p class="mt-3 text-muted">Loading task details...</p>
+                    </div>
+                    <div id="task-error-container" class="d-none">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="task-error-message"></span>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button id="task-error-retry" class="btn btn-primary">
+                                <i class="fas fa-refresh me-2"></i> Try Again
+                            </button>
+                        </div>
                     </div>
 
                     <div id="task-details-container" style="display: none;">
@@ -707,6 +1138,18 @@
                                     <span class="text-muted small">Assigned on:</span>
                                     <span id="task-modal-created-at" class="fw-semibold"></span>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Task Completion Progress -->
+                        <div class="mb-4" id="completion-container" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="completion-stats" id="completion-stats"></span>
+                                <span class="completion-percentage fw-bold" id="completion-percentage"></span>
+                            </div>
+                            <div class="progress completion-progress">
+                                <div id="completion-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
 
@@ -732,44 +1175,36 @@
                                         <p class="text-muted">No comments yet</p>
                                     </div>
                                 </div>
+
+                                <!-- Comment Input -->
+                                <div class="comment-input-container mt-3">
+                                    <textarea id="comment-input" class="form-control" rows="2"
+                                        placeholder="Add a comment..."></textarea>
+                                    <button id="comment-submit-btn" class="comment-submit-btn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <div id="task-submission-form-container">
-                            <form id="taskSubmissionForm" action="/tasks/submit" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="task_id" id="submission_task_id">
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label fw-semibold">Add Comment</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="3"
-                                        placeholder="Add your comments here..."></textarea>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="attachments" class="form-label fw-semibold">Add Attachments</label>
-                                    <input class="form-control" type="file" id="attachments" name="attachments[]" multiple>
-                                    <div class="form-text">Upload relevant files (max 5MB each)</div>
-                                </div>
-                                <button type="submit" class="btn btn-primary px-4 py-2" id="submitTaskBtn">
-                                    <i class="fas fa-paper-plane me-2"></i> Submit Task
-                                </button>
-                            </form>
+                        <!-- Required Documents Section -->
+                        <div id="required-documents-container" class="mb-4" style="display: none;">
+                            <h6 class="fw-semibold mb-3 text-uppercase small text-muted border-bottom pb-2">Required
+                                Documents</h6>
+                            <div id="required-documents-list" class="row"></div>
                         </div>
-                    </div>
-
-                    <div id="task-error-container" class="d-flex align-items-center p-3 bg-light rounded"
-                        style="display: none;">
-                        <!-- <i class="fas fa-exclamation-circle me-3 fs-4 text-danger"></i>
-                        <div>
-                            <p class="mb-1" id="task-error-message">Failed to load task details.</p>
-                            <div class="mt-2">
-                                <button id="task-error-retry" class="btn btn-sm btn-outline-primary">Retry</button>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
-                <div class="modal-footer border-0 bg-light">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+
+                <!-- Submission Footer with Submit and Close buttons -->
+                <div class="submission-footer" id="submission-footer" style="display: none;">
+                    <div class="completion-info" id="completion-info"></div>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="submitTaskBtn">
+                            <i class="fas fa-paper-plane me-2"></i> Submit Task
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -777,15 +1212,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Auto-hide notification
-            const notification = document.querySelector('.notification-toast');
-            if (notification) {
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    notification.classList.add('hide');
-                }, 5000);
-            }
-
             // Task view modal functionality
             const viewTaskButtons = document.querySelectorAll('.view-task-btn');
             const taskViewModal = new bootstrap.Modal(document.getElementById('taskViewModal'));
@@ -795,7 +1221,6 @@
                     const taskId = this.getAttribute('data-task-id');
                     showTaskLoadingState();
                     loadTaskDetails(taskId);
-                    document.getElementById('submission_task_id').value = taskId;
                     taskViewModal.show();
                 });
             });
@@ -807,15 +1232,14 @@
                 loadTaskDetails(taskId);
             });
 
-            // Sort functionality
-            document.getElementById('sortSelect').addEventListener('change', function () {
-                sortTasks(this.value);
+            // Comment submit button
+            document.getElementById('comment-submit-btn').addEventListener('click', function () {
+                submitComment();
             });
 
-            // Sidebar toggle
-            document.getElementById('sidebarToggle').addEventListener('click', function () {
-                document.getElementById('sidebar').classList.toggle('active');
-                document.getElementById('mainContent').classList.toggle('active');
+            // Submit task button
+            document.getElementById('submitTaskBtn').addEventListener('click', function () {
+                submitTaskForm();
             });
         });
 
@@ -823,12 +1247,19 @@
             document.getElementById('task-loading-indicator').style.display = 'block';
             document.getElementById('task-details-container').style.display = 'none';
             document.getElementById('task-error-container').style.display = 'none';
+            document.getElementById('submission-footer').style.display = 'none';
         }
 
         function showTaskDetails() {
             document.getElementById('task-loading-indicator').style.display = 'none';
             document.getElementById('task-details-container').style.display = 'block';
             document.getElementById('task-error-container').style.display = 'none';
+
+            // Show submission footer if task is not completed
+            const taskStatus = document.getElementById('task-modal-status').textContent.toLowerCase();
+            if (taskStatus !== 'completed') {
+                document.getElementById('submission-footer').style.display = 'flex';
+            }
         }
 
         function showTaskError(errorMessage) {
@@ -836,6 +1267,7 @@
             document.getElementById('task-details-container').style.display = 'none';
             document.getElementById('task-error-container').style.display = 'flex';
             document.getElementById('task-error-message').textContent = errorMessage || 'Failed to load task details.';
+            document.getElementById('submission-footer').style.display = 'none';
         }
 
         function loadTaskDetails(taskId) {
@@ -856,16 +1288,8 @@
                     // Populate basic task info
                     document.getElementById('task-modal-title').textContent = task.title;
                     document.getElementById('task-modal-description').textContent = task.description;
-                    document.getElementById('task-modal-status').textContent = task.status;
-                    document.getElementById('task-modal-status').className = `badge rounded-pill ${getStatusClass(task.status)}`;
-
-                    // Hide submission form if task is completed
-                    const submissionForm = document.getElementById('task-submission-form-container');
-                    if (task.status.toLowerCase() === 'completed') {
-                        submissionForm.style.display = 'none';
-                    } else {
-                        submissionForm.style.display = 'block';
-                    }
+                    document.getElementById('task-modal-status').textContent = task.overall_status || task.status;
+                    document.getElementById('task-modal-status').className = `badge rounded-pill ${getStatusClass(task.overall_status || task.status)}`;
 
                     if (task.priority) {
                         document.getElementById('task-modal-priority').textContent = task.priority.name;
@@ -879,6 +1303,30 @@
                     document.getElementById('task-modal-creator').textContent = task.creator.name;
                     document.getElementById('task-modal-created-at').textContent = task.created_at_formatted;
 
+                    // Calculate and display completion percentage if required documents exist
+                    if (task.require_documents && task.required_documents && task.required_documents.length > 0) {
+                        const approvedCount = task.required_documents.filter(doc =>
+                            doc.submission_status === 'approved'
+                        ).length;
+
+                        const totalCount = task.required_documents.length;
+                        const completionPercentage = Math.round((approvedCount / totalCount) * 100);
+
+                        document.getElementById('completion-stats').textContent =
+                            `${approvedCount} of ${totalCount} documents approved`;
+                        document.getElementById('completion-percentage').textContent =
+                            `${completionPercentage}%`;
+                        document.getElementById('completion-progress-bar').style.width =
+                            `${completionPercentage}%`;
+                        document.getElementById('completion-progress-bar').className =
+                            `progress-bar ${completionPercentage === 100 ? 'bg-success' : 'bg-primary'}`;
+                        document.getElementById('completion-progress-bar').setAttribute('aria-valuenow', completionPercentage);
+
+                        document.getElementById('completion-container').style.display = 'block';
+                    } else {
+                        document.getElementById('completion-container').style.display = 'none';
+                    }
+
                     // Load attachments
                     const attachmentsContainer = document.getElementById('task-modal-attachments');
                     attachmentsContainer.innerHTML = '';
@@ -889,21 +1337,21 @@
 
                             if (attachment.mime_type && attachment.mime_type.startsWith('image/')) {
                                 attachmentElement.innerHTML = `
-                                    <a href="/storage/${attachment.url}" target="_blank" class="d-block">
-                                        <img src="/storage/${attachment.url}" class="attachment-thumbnail" 
-                                             alt="${attachment.original_name}" title="${attachment.original_name}">
-                                    </a>
-                                    <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
-                                `;
+                                <a href="${attachment.url}" target="_blank" class="d-block">
+                                    <img src="${attachment.url}" class="attachment-thumbnail" 
+                                         alt="${attachment.original_name}" title="${attachment.original_name}">
+                                </a>
+                                <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
+                            `;
                             } else {
                                 attachmentElement.innerHTML = `
-                                    <a href="/storage/${attachment.url}" target="_blank" class="d-block text-center">
-                                        <div class="attachment-thumbnail d-flex align-items-center justify-content-center bg-white">
-                                            <i class="fas fa-file-alt fa-2x text-secondary"></i>
-                                        </div>
-                                        <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
-                                    </a>
-                                `;
+                                <a href="${attachment.url}" target="_blank" class="d-block text-center">
+                                    <div class="attachment-thumbnail d-flex align-items-center justify-content-center bg-white">
+                                        <i class="fas fa-file-alt fa-2x text-secondary"></i>
+                                    </div>
+                                    <small class="d-block text-muted text-truncate" style="max-width: 100px">${attachment.original_name}</small>
+                                </a>
+                            `;
                             }
 
                             attachmentsContainer.appendChild(attachmentElement);
@@ -912,36 +1360,364 @@
                         attachmentsContainer.innerHTML = '<p class="text-muted">No attachments</p>';
                     }
 
-                    // Load comments
+                    // Load comments (newest first at the bottom)
                     const commentsContainer = document.getElementById('task-modal-comments');
                     commentsContainer.innerHTML = '';
                     if (task.comments && task.comments.length > 0) {
-                        task.comments.forEach(comment => {
+                        // Sort comments by date (newest first)
+                        const sortedComments = [...task.comments].sort((a, b) =>
+                            new Date(b.created_at) - new Date(a.created_at)
+                        );
+
+                        sortedComments.forEach(comment => {
                             const commentElement = document.createElement('div');
                             commentElement.className = 'comment-item';
+
+                            // Check if comment is from current user
+                            const isOwnComment = comment.user.id === {{ Auth::id() }};
+
                             commentElement.innerHTML = `
+                            <div class="comment-bubble ${isOwnComment ? 'own' : 'other'}">
                                 <div class="d-flex align-items-center mb-2">
                                     <img src="${comment.user.avatar_url || '/storage/profile/avatars/profile.png'}" 
-                                         class="user-avatar" alt="${comment.user.name}">
-                                    <div>
+                                         class="user-avatar" alt="${comment.user.name}" width="32" height="32">
+                                    <div class="ms-2">
                                         <span class="comment-user">${comment.user.name}</span>
-                                        <span class="comment-time">${comment.created_at}</span>
+                                        <span class="comment-time ms-2">${comment.created_at}</span>
                                     </div>
                                 </div>
-                                <p class="ms-4 mb-0">${comment.content}</p>
-                            `;
+                                <p class="mb-0">${comment.content}</p>
+                            </div>
+                        `;
                             commentsContainer.appendChild(commentElement);
                         });
                     } else {
                         commentsContainer.innerHTML = '<p class="text-muted">No comments yet</p>';
                     }
 
+                    // Load required documents
+                    const requiredDocsContainer = document.getElementById('required-documents-container');
+                    const requiredDocsList = document.getElementById('required-documents-list');
+                    requiredDocsList.innerHTML = '';
+
+                    if (task.require_documents && task.required_documents && task.required_documents.length > 0) {
+                        requiredDocsContainer.style.display = 'block';
+
+                        task.required_documents.forEach((doc, index) => {
+                            const docElement = document.createElement('div');
+                            docElement.className = 'col-md-6 mb-3';
+
+                            // Check if document is already submitted
+                            const isSubmitted = doc.is_submitted;
+                            const submissionStatus = doc.submission_status;
+                            const rejectionReason = doc.submission_rejection_reason;
+
+                            let statusBadge = '';
+                            let fileInfo = '';
+                            let rejectionInfo = '';
+                            let actionButtons = '';
+
+                            // Find the submitted document info from assignees data
+                            let submittedDocInfo = null;
+                            if (task.assignees && task.assignees.length > 0) {
+                                const currentUser = task.assignees.find(a => a.id === {{ Auth::id() }});
+                                if (currentUser && currentUser.submitted_documents) {
+                                    submittedDocInfo = currentUser.submitted_documents.find(sd =>
+                                        sd.required_document_name === doc.name
+                                    );
+                                }
+                            }
+
+                            if (isSubmitted && submissionStatus) {
+                                // Document already submitted - show status
+                                const statusClass = getDocumentStatusClass(submissionStatus);
+                                statusBadge = `
+                                <div class="mb-2">
+                                    <span class="badge ${statusClass} document-status">${submissionStatus.toUpperCase()}</span>
+                                </div>
+                            `;
+
+                                // Show file info if we have it
+                                if (submittedDocInfo) {
+                                    fileInfo = `
+                                    <div class="mb-2">
+                                        <a href="#" class="btn btn-sm btn-outline-primary" onclick="downloadSubmittedDocument(${submittedDocInfo.id})">
+                                            <i class="fas fa-download me-1"></i> View Document
+                                        </a>
+                                    </div>
+                                `;
+                                }
+
+                                // Show rejection reason if document was rejected
+                                if (submissionStatus === 'rejected') {
+                                    if (rejectionReason) {
+                                     rejectionInfo = `
+                                     <div class="alert alert-danger p-2 mt-2">
+                                         <strong><i class="fas fa-exclamation-circle me-1"></i> Rejection Reason:</strong>
+                                         <span class="small d-block mt-1">${rejectionReason}</span>
+                                     </div>
+                                    `;
+                                    }
+                                    // Allow reupload for rejected documents
+                                    actionButtons = `
+                                    <div class="mt-2">
+                                        <label for="required_doc_${doc.id}" class="form-label small fw-semibold">Reupload Document</label>
+                                        <input type="file" class="form-control form-control-sm" 
+                                               id="required_doc_${doc.id}" 
+                                               name="required_documents[${doc.id}]" 
+                                               ${doc.type === 'image' ? 'accept="image/*"' : ''}
+                                               required>
+                                        <div class="form-text">Please upload a revised version of this document.</div>
+                                    </div>
+                                `;
+                                } else if (submissionStatus === 'pending') {
+                                    // For pending documents, show status message
+                                    actionButtons = `
+                                    <div class="alert alert-info p-2 mt-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span class="small">Your document is awaiting review.</span>
+                                    </div>
+                                `;
+                                } else if (submissionStatus === 'approved') {
+                                    // For approved documents, show success message
+                                    const reviewedAt = submittedDocInfo ? submittedDocInfo.reviewed_at : 'N/A';
+                                    actionButtons = `
+                                    <div class="alert alert-success p-2 mt-2">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        <span class="small">Document approved on ${reviewedAt}.</span>
+                                    </div>
+                                `;
+                                }
+                            } else {
+                                // Document not submitted - show file input
+                                actionButtons = `
+                                <div class="mt-2">
+                                    <label for="required_doc_${doc.id}" class="form-label small fw-semibold">Upload File</label>
+                                    <input type="file" class="form-control form-control-sm" 
+                                           id="required_doc_${doc.id}" 
+                                           name="required_documents[${doc.id}]" 
+                                           ${doc.type === 'image' ? 'accept="image/*"' : ''}
+                                           required>
+                                    <div class="form-text">${doc.type === 'image' ? 'Please upload an image file' : 'Please upload the required document'}</div>
+                                </div>
+                            `;
+                            }
+
+                            docElement.innerHTML = `
+                            <div class="card h-100 border-0 shadow-sm required-doc-card">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-semibold d-flex align-items-center">
+                                        <i class="fas fa-file-alt me-2 text-primary"></i>
+                                        ${doc.name}
+                                    </h6>
+                                    <p class="card-text small text-muted mb-2">${doc.description || 'No description provided'}</p>
+                                    <div class="mb-2">
+                                        <span class="badge bg-light text-dark small">${doc.type}</span>
+                                    </div>
+                                    ${statusBadge}
+                                    ${fileInfo}
+                                    ${rejectionInfo}
+                                    ${actionButtons}
+                                </div>
+                            </div>
+                        `;
+                            requiredDocsList.appendChild(docElement);
+                        });
+                    } else {
+                        requiredDocsContainer.style.display = 'none';
+                    }
+
                     showTaskDetails();
+                    document.getElementById('submission_task_id').value = taskId;
                 })
                 .catch(error => {
                     console.error('Error loading task details:', error);
                     showTaskError(error.message || 'Failed to load task details. Please try again.');
                 });
+        }
+
+        function submitComment() {
+            const commentText = document.getElementById('comment-input').value.trim();
+            const taskId = document.getElementById('submission_task_id').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            if (!commentText) {
+                showToast('Please enter a comment', 'error');
+                return;
+            }
+
+            if (!taskId) {
+                showToast('Unable to determine task ID. Please reopen the task details.', 'error');
+                return;
+            }
+
+            if (!csrfToken) {
+                showToast('Security token missing. Please refresh the page.', 'error');
+                return;
+            }
+
+            // Show loading state on button
+            const submitBtn = document.getElementById('comment-submit-btn');
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            submitBtn.disabled = true;
+
+            fetch('/tasks/comment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    task_id: taskId,
+                    comment: commentText
+                })
+            })
+                .then(response => {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            return { data, response };
+                        });
+                    } else {
+                        return response.text().then(text => {
+                            throw new Error('Server returned non-JSON response');
+                        });
+                    }
+                })
+                .then(({ data, response }) => {
+                    if (response.ok && data.success) {
+                        document.getElementById('comment-input').value = '';
+                        loadTaskDetails(taskId); // Reload task details to show new comment
+                        showToast('Comment added successfully', 'success');
+                    } else {
+                        throw new Error(data.message || `Server error: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting comment:', error);
+                    showToast(error.message || 'Failed to add comment. Please try again.', 'error');
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitBtn.innerHTML = originalHtml;
+                    submitBtn.disabled = false;
+                });
+        }
+
+        function submitTaskForm() {
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                showToast('Security error. Please refresh the page and try again.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            const taskId = document.getElementById('submission_task_id').value;
+            const submitBtn = document.getElementById('submitTaskBtn');
+
+            // Add task ID
+            formData.append('task_id', taskId);
+
+            // Add all file inputs
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            let hasFiles = false;
+
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    // Extract the document ID from the input ID
+                    const docId = input.id.replace('required_doc_', '');
+                    formData.append(`required_documents[${docId}]`, input.files[0]);
+                    hasFiles = true;
+                }
+            });
+
+            if (!hasFiles) {
+                showToast('Please upload at least one document', 'error');
+                return;
+            }
+
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Submitting...';
+
+            fetch('/tasks/submit', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+                .then(response => {
+                    return response.json().then(data => {
+                        return { data, status: response.status };
+                    }).catch(error => {
+                        throw new Error('Server returned invalid JSON response');
+                    });
+                })
+                .then(({ data, status }) => {
+                    if (status === 200 && data.success) {
+                        showToast('Task submitted successfully!', 'success');
+
+                        // Close modal after a brief delay
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('taskViewModal'));
+                            if (modal) {
+                                modal.hide();
+                            }
+                            location.reload(); // Reload page to reflect changes
+                        }, 1500);
+                    } else {
+                        throw new Error(data.message || `Server error: ${status}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting task:', error);
+                    showToast(error.message || 'Failed to submit task. Please try again.', 'error');
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+        }
+
+        function getDocumentStatusClass(status) {
+            const statusClasses = {
+                'pending': 'bg-warning text-dark',
+                'approved': 'bg-success',
+                'rejected': 'bg-danger'
+            };
+            return statusClasses[status.toLowerCase()] || 'bg-secondary';
+        }
+
+        function showToast(message, type = 'info') {
+            // Create toast element if it doesn't exist
+            if (!document.getElementById('notificationToast')) {
+                const toastContainer = document.createElement('div');
+                toastContainer.innerHTML = `
+                <div id="notificationToast" class="toast align-items-center text-white bg-${type}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i>
+                            <span id="toastMessage"></span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+                document.body.appendChild(toastContainer.firstElementChild);
+            }
+
+            // Set message and show toast
+            document.getElementById('toastMessage').textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById('notificationToast'), {
+                delay: 3000
+            });
+            toast.show();
         }
 
         function getStatusClass(status) {
@@ -953,7 +1729,7 @@
                 'rejected': 'bg-danger',
                 'pending_approval': 'bg-primary'
             };
-            return statusClasses[status.toLowerCase()] || 'bg-secondary';
+            return statusClasses[status] || 'bg-secondary';
         }
 
         function getPriorityClass(priority) {
@@ -962,32 +1738,15 @@
                 'medium': 'bg-warning text-dark',
                 'low': 'bg-success'
             };
-            return priorityClasses[priority.toLowerCase()] || 'bg-secondary';
+            return priorityClasses[priority] || 'bg-secondary';
         }
 
-        function sortTasks(criteria) {
-            // Get all tab panes
-            const tabPanes = document.querySelectorAll('.tab-pane');
-
-            tabPanes.forEach(tabPane => {
-                const taskContainer = tabPane;
-                const tasks = Array.from(taskContainer.querySelectorAll('.task-card'));
-
-                tasks.sort((a, b) => {
-                    if (criteria === 'due_date') {
-                        return new Date(a.getAttribute('data-due-date')) - new Date(b.getAttribute('data-due-date'));
-                    } else if (criteria === 'priority') {
-                        const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3, '': 4 };
-                        return priorityOrder[a.getAttribute('data-priority') || ''] - priorityOrder[b.getAttribute('data-priority') || ''];
-                    } else if (criteria === 'status') {
-                        return a.getAttribute('data-status').localeCompare(b.getAttribute('data-status'));
-                    }
-                    return 0;
-                });
-
-                // Re-append sorted tasks
-                tasks.forEach(task => taskContainer.appendChild(task));
-            });
+        // Helper function for downloading submitted documents
+        function downloadSubmittedDocument(documentId) {
+            // Implement this based on your backend API
+            console.log('Download document with ID:', documentId);
+            // Example implementation:
+            // window.open(`/documents/${documentId}/download`, '_blank');
         }
     </script>
 @endsection

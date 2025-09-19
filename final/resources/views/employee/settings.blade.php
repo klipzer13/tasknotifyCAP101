@@ -276,24 +276,360 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <!-- Top Navigation -->
-        <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-            <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="notification-badge">3</span>
+      <!-- Top Navigation -->
+      <nav class="top-navbar navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2 px-3 mb-4 sticky-top">
+            <div class="container-fluid d-flex justify-content-between align-items-center p-0">
+                <!-- Left side - Toggle button and Brand -->
+                <div class="d-flex align-items-center">
+                    <!-- Hamburger menu - only visible on mobile -->
+                    <button class="sidebar-collapse-btn btn btn-link text-dark p-0 me-2 me-md-3 d-lg-none"
+                        id="sidebarToggle">
+                        <i class="fas fa-bars fs-4"></i>
+                    </button>
+                    <span class="navbar-brand fw-bold text-primary ms-1 ms-md-2" id="adminGreeting">Good Morning</span>
                 </div>
-                <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? 'https://via.placeholder.com/40' }}" alt="User"
-                        class="rounded-circle">
-                    <span>{{ Auth::user()->name }}</span>
+
+                <!-- Right side - Navigation and User Info -->
+                <div class="d-flex align-items-center">
+                    <!-- Notification and User Profile -->
+                    <div class="d-flex align-items-center ms-2 ms-lg-0">
+                        <!-- Notification -->
+                        <div class="dropdown position-relative me-2 me-lg-3">
+                            <button class="btn btn-link text-dark p-0 position-relative dropdown-toggle"
+                                id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                aria-label="Notifications">
+                                <i class="fas fa-bell fs-5"></i>
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                    id="notificationBadge">
+                                    3
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                                aria-labelledby="notificationDropdown">
+                                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+                                    <h6 class="m-0 fw-bold">Notifications</h6>
+                                    <div>
+                                        <span class="badge bg-primary rounded-pill me-2" id="notificationCount">3</span>
+                                        <button class="btn btn-sm btn-link text-muted p-0 mark-all-read"
+                                            title="Mark all as read">
+                                            <i class="fas fa-check-double"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+                                    <!-- Sample notification items -->
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item unread">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-user-check text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">New User Registered</h6>
+                                                <small class="text-muted">2 min ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">John Doe has registered as a new user.</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-primary bg-opacity-10 text-primary small fw-normal">Users</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item unread">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-warning bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">Server Warning</h6>
+                                                <small class="text-muted">1 hour ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">Server CPU usage is high (85%). Please check
+                                                immediately.</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-warning bg-opacity-10 text-warning small fw-normal">System</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="dropdown-item d-flex py-3 px-3 notification-item">
+                                        <div class="flex-shrink-0 me-3">
+                                            <div class="bg-success bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center"
+                                                style="width: 38px; height: 38px;">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="mb-0 fw-semibold">Task Completed</h6>
+                                                <small class="text-muted">3 hours ago</small>
+                                            </div>
+                                            <p class="mb-0 text-muted small">Your scheduled backup was completed
+                                                successfully.</p>
+                                            <div class="mt-2">
+                                                <span
+                                                    class="badge bg-success bg-opacity-10 text-success small fw-normal">Backup</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="text-center py-3 bg-light border-top">
+                                        <a href="#" class="text-primary fw-semibold small">View All Notifications</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Profile -->
+                        <div class="d-flex align-items-center ms-2 ms-lg-3 border-start ps-2 ps-lg-3">
+                            <img src="{{ Auth::user()->avatar_url ?? asset('storage/profile/avatars/profile.png') }}"
+                                alt="User Profile" class="rounded-circle me-2 border border-2 border-primary" width="40"
+                                height="40">
+                            <div class="d-none d-md-inline">
+                                <div class="fw-bold text-dark">{{ ucwords(strtolower(Auth::user()->name)) }}</div>
+                                <div class="small text-muted">Employee</div>
+                            </div>
+                            <!-- Show only name on small screens -->
+                            <div class="d-inline d-md-none">
+                                <div class="fw-bold text-dark">
+                                    {{ explode(' ', ucwords(strtolower(Auth::user()->name)))[0] }}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </nav>
 
+        <style>
+            .top-navbar {
+                transition: all 0.3s ease;
+            }
+
+            .nav-link {
+                transition: color 0.2s;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+            }
+
+            .nav-link:hover {
+                color: #0d6efd !important;
+                background-color: rgba(13, 110, 253, 0.1);
+            }
+
+            .nav-link.active {
+                color: #0d6efd !important;
+                font-weight: 500;
+            }
+
+            .sidebar-collapse-btn:hover {
+                transform: scale(1.1);
+            }
+
+            /* Notification dropdown styles */
+            .notification-dropdown {
+                width: 380px;
+                border: none;
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+
+            .notification-item {
+                transition: all 0.2s ease;
+                border-left: 3px solid transparent;
+            }
+
+            .notification-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .notification-item.unread {
+                background-color: #f8faff;
+                border-left-color: #0d6efd;
+            }
+
+            .notification-item .flex-shrink-0 {
+                flex: 0 0 38px;
+            }
+
+            .notification-list {
+                scrollbar-width: thin;
+                scrollbar-color: #dee2e6 #f8f9fa;
+            }
+
+            .notification-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .notification-list::-webkit-scrollbar-track {
+                background: #f8f9fa;
+            }
+
+            .notification-list::-webkit-scrollbar-thumb {
+                background-color: #dee2e6;
+                border-radius: 3px;
+            }
+
+            .mark-all-read:hover {
+                color: #0d6efd !important;
+            }
+
+            /* Mobile specific styles */
+            @media (max-width: 575.98px) {
+                .top-navbar {
+                    padding-left: 0.5rem;
+                    padding-right: 0.5rem;
+                }
+
+                .navbar-brand {
+                    font-size: 1rem;
+                }
+
+                .border-start {
+                    border-left: none !important;
+                }
+
+                .notification-dropdown {
+                    width: 300px;
+                    margin-right: -50px;
+                }
+            }
+        </style>
+
+        <script>
+            // Function to update greeting based on time of day
+            function updateGreeting() {
+                const greetingElement = document.getElementById('adminGreeting');
+                const hour = new Date().getHours();
+                let greeting;
+
+                if (hour < 12) {
+                    greeting = 'Good Morning';
+                } else if (hour < 18) {
+                    greeting = 'Good Afternoon';
+                } else {
+                    greeting = 'Good Evening';
+                }
+
+                greetingElement.textContent = `${greeting}`;
+            }
+
+            // Update greeting on page load and resize
+            document.addEventListener('DOMContentLoaded', function () {
+                updateGreeting();
+
+                // Notification functionality
+                const notificationDropdown = document.getElementById('notificationDropdown');
+                const notificationBadge = document.getElementById('notificationBadge');
+                const notificationCount = document.getElementById('notificationCount');
+                const markAllReadBtn = document.querySelector('.mark-all-read');
+
+                // Mark notifications as read when dropdown is shown
+                notificationDropdown.addEventListener('shown.bs.dropdown', function () {
+                    // Only mark as read if there are unread notifications
+                    if (parseInt(notificationBadge.textContent) > 0) {
+                        document.querySelectorAll('.notification-item.unread').forEach(item => {
+                            item.classList.remove('unread');
+                            item.style.borderLeftColor = 'transparent';
+                            item.style.backgroundColor = '';
+                        });
+
+                        // Update badge count to 0
+                        notificationBadge.textContent = '0';
+                        notificationCount.textContent = '0';
+                    }
+                });
+
+                // Mark all as read button
+                markAllReadBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.style.borderLeftColor = 'transparent';
+                        item.style.backgroundColor = '';
+                    });
+
+                    // Update badge count to 0
+                    notificationBadge.textContent = '0';
+                    notificationCount.textContent = '0';
+                });
+
+                // Sample function to add a new notification
+                function addNotification(title, message, type = 'info', category = 'General') {
+                    const icons = {
+                        'info': 'fa-info-circle',
+                        'warning': 'fa-exclamation-triangle',
+                        'success': 'fa-check-circle',
+                        'danger': 'fa-exclamation-circle',
+                        'user': 'fa-user'
+                    };
+
+                    const colors = {
+                        'info': 'primary',
+                        'warning': 'warning',
+                        'success': 'success',
+                        'danger': 'danger',
+                        'user': 'info'
+                    };
+
+                    const notificationList = document.querySelector('.notification-list');
+                    const newNotification = document.createElement('a');
+                    newNotification.href = '#';
+                    newNotification.className = 'dropdown-item d-flex py-3 px-3 notification-item unread';
+                    newNotification.innerHTML = `
+                    <div class="flex-shrink-0 me-3">
+                        <div class="bg-${colors[type]} bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="fas ${icons[type]} text-${colors[type]}"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h6 class="mb-0 fw-semibold">${title}</h6>
+                            <small class="text-muted">just now</small>
+                        </div>
+                        <p class="mb-0 text-muted small">${message}</p>
+                        <div class="mt-2">
+                            <span class="badge bg-${colors[type]} bg-opacity-10 text-${colors[type]} small fw-normal">${category}</span>
+                        </div>
+                    </div>
+                `;
+
+                    // Insert at the top of the list (before the "View All" link)
+                    const viewAllLink = notificationList.querySelector('.bg-light.border-top');
+                    notificationList.insertBefore(newNotification, viewAllLink);
+
+                    // Update badge count
+                    const currentCount = parseInt(notificationBadge.textContent) || 0;
+                    notificationBadge.textContent = currentCount + 1;
+                    notificationCount.textContent = currentCount + 1;
+
+                    // Add animation for new notification
+                    newNotification.style.opacity = '0';
+                    newNotification.style.transform = 'translateY(-10px)';
+                    newNotification.style.transition = 'all 0.3s ease';
+
+                    setTimeout(() => {
+                        newNotification.style.opacity = '1';
+                        newNotification.style.transform = 'translateY(0)';
+                    }, 10);
+                }
+
+                // Example: Add a new notification after 5 seconds
+                // setTimeout(() => {
+                //     addNotification('System Update', 'A new system update is available for installation.', 'info', 'System');
+                // }, 5000);
+            });
+
+            // Optional: Update greeting every minute in case page stays open for long
+            setInterval(updateGreeting, 60000);
+        </script>
         <!-- Settings/Profile Content -->
         <div class="settings-container">
             <div class="section-header">
@@ -324,6 +660,7 @@
             <div class="tab-content" id="settingsTabsContent">
                 <!-- Profile Tab -->
                 <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                    
                     <div class="profile-card">
                         <div class="profile-header">
                             <div class="avatar-upload">
@@ -489,17 +826,6 @@
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-
-                                <div class="notification-item">
-                                    <div>
-                                        <div class="notification-label">Approval Requests</div>
-                                        <div class="notification-description">When team members request your approval</div>
-                                    </div>
-                                    <label class="switch">
-                                        <input type="checkbox" name="notifications[approval_requested]" value="1" {{ Auth::user()->notification_preferences['approval_requested'] ?? true ? 'checked' : '' }}>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -511,28 +837,6 @@
                                     </div>
                                     <label class="switch">
                                         <input type="checkbox" name="notifications[due_date_reminder]" value="1" {{ Auth::user()->notification_preferences['due_date_reminder'] ?? true ? 'checked' : '' }}>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-
-                                <div class="notification-item">
-                                    <div>
-                                        <div class="notification-label">Daily Digest</div>
-                                        <div class="notification-description">Summary of tasks and updates</div>
-                                    </div>
-                                    <label class="switch">
-                                        <input type="checkbox" name="notifications[daily_digest]" value="1" {{ Auth::user()->notification_preferences['daily_digest'] ?? true ? 'checked' : '' }}>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-
-                                <div class="notification-item">
-                                    <div>
-                                        <div class="notification-label">Weekly Reports</div>
-                                        <div class="notification-description">Weekly summary of team progress</div>
-                                    </div>
-                                    <label class="switch">
-                                        <input type="checkbox" name="notifications[weekly_report]" value="1" {{ Auth::user()->notification_preferences['weekly_report'] ?? false ? 'checked' : '' }}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -553,8 +857,8 @@
 
                                 <div class="notification-item">
                                     <div>
-                                        <div class="notification-label">Push Notifications</div>
-                                        <div class="notification-description">Receive notifications on your devices</div>
+                                        <div class="notification-label">SMS Notifications</div>
+                                        <div class="notification-description">Receive notifications via sms</div>
                                     </div>
                                     <label class="switch">
                                         <input type="checkbox" name="notification_methods[push]" value="1" {{ Auth::user()->notification_methods['push'] ?? true ? 'checked' : '' }}>
@@ -562,7 +866,7 @@
                                     </label>
                                 </div>
 
-                                <div class="notification-item">
+                                <!-- <div class="notification-item">
                                     <div>
                                         <div class="notification-label">In-App Notifications</div>
                                         <div class="notification-description">Show notifications within the application
@@ -572,7 +876,7 @@
                                         <input type="checkbox" name="notification_methods[in_app]" value="1" {{ Auth::user()->notification_methods['in_app'] ?? true ? 'checked' : '' }}>
                                         <span class="slider"></span>
                                     </label>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="text-end">

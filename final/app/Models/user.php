@@ -84,6 +84,13 @@ class User extends Authenticatable
     {
         return $this->role?->name;
     }
-
+    public function taskAssignments()
+    {
+        return $this->hasMany(\App\Models\Task_User::class, 'user_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Attachment;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
@@ -56,8 +57,14 @@ class Task extends Model
         return $this->hasMany(TaskComment::class);
     }
 
-
-
-
+    public function requiredDocuments(): HasMany
+    {
+        return $this->hasMany(RequiredDocument::class);
+    }
+    
+    public function submittedDocuments()
+    {
+        return $this->hasMany(SubmittedDocument::class);
+    }
 
 }

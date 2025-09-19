@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>TaskNotify</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -24,40 +24,46 @@
 
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                        url('/image/Psulogin1.jpg') no-repeat center center fixed;
+                        url('/image/psubuilding.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-container {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            min-height: 100vh;
-            padding-right: 20%;
+        /* Background blur overlay */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(8px) brightness(0.7);
+            z-index: -1;
+            transform: scale(1.05); /* Prevents blur edge artifacts */
         }
 
         .login-card {
             border: none;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             width: var(--card-width);
-            /* Glass effect styles */
-            background: rgba(255, 255, 255, 0.15);
+            /* Enhanced glass effect */
+            background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .login-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            position: relative;
+            z-index: 1;
         }
 
         .login-header {
@@ -311,25 +317,92 @@
             border-radius: 4px;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .login-container {
-                justify-content: center;
-                padding-right: 5%;
-                padding-left: 5%;
+        /* Notification Styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .notification {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-success {
+            border-left-color: #28a745;
+        }
+
+        .notification-error {
+            border-left-color: #dc3545;
+        }
+
+        .notification-icon {
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .notification-success .notification-icon {
+            color: #28a745;
+        }
+
+        .notification-error .notification-icon {
+            color: #dc3545;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
 
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             :root {
                 --card-width: 90%;
                 --glass-blur: 8px;
                 --input-height: 48px;
-            }
-            
-            .login-container {
-                padding-right: 15px;
-                padding-left: 15px;
             }
             
             .login-header {
@@ -344,12 +417,12 @@
                 width: 60px;
                 height: 60px;
             }
-        }
 
-        /* Animation for inputs */
-        @keyframes inputHighlighter {
-            from { background: var(--primary-yellow); }
-            to   { width: 0; background: transparent; }
+            .notification-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
         }
 
         /* Highlight effect for focused inputs */
@@ -371,54 +444,85 @@
         .input-highlight:focus-within:after {
             width: 100%;
         }
+        
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <img src="/image/logo.png" alt="Company Logo" class="logo-img">
-                <h2><i class="fas fa-bell me-2 "></i>TASKNOTIFY</h2>
-                <p>Please sign in to continue</p>
+    <!-- Notification Container -->
+    <div class="notification-container">
+        @if(session('success'))
+            <div class="notification notification-success">
+                <div class="notification-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Success</div>
+                    <p class="notification-message">{{ session('success') }}</p>
+                </div>
             </div>
-            
-            <div class="login-body">
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-                    <div class="mb-4 input-highlight">
-                        <label for="email" class="form-label">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email"
-                                placeholder="admin@example.com" required autofocus>
-                        </div>
-                    </div>
-                    <div class="mb-4 input-highlight">
-                        <label for="password" class="form-label">Password</label>
-                        <div class="input-group password-toggle-container">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password"
-                                placeholder="••••••••" required>
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mb-4 d-flex justify-content-between align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                            <label class="form-check-label" for="remember">Remember me</label>
-                        </div>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
-                        @endif
-                    </div>
-                    <button type="submit" class="btn btn-login btn-block w-100 mb-3">
-                        <span><i class="fas fa-sign-in-alt me-2"></i>LOGIN</span>
-                    </button>
-                </form>
+        @endif
+
+        @if(session('error') || $errors->any())
+            <div class="notification notification-error">
+                <div class="notification-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Error</div>
+                    <p class="notification-message">
+                        {{ session('error') }}
+                        @foreach ($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </p>
+                </div>
             </div>
+        @endif
+    </div>
+
+    <div class="login-card">
+        <div class="login-header">
+            <img src="/image/logo.png" alt="Company Logo" class="logo-img">
+            <h2><i class="fas fa-bell me-2"></i>TASKNOTIFY</h2>
+            <p>Please sign in to continue</p>
+        </div>
+        
+        <div class="login-body">
+            <form method="POST" action="{{ route('login') }}" id="loginForm">
+                @csrf
+                <div class="mb-4 input-highlight">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email"
+                            placeholder="admin@example.com" value="{{ old('email') }}" required autofocus>
+                    </div>
+                </div>
+                <div class="mb-4 input-highlight">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group password-toggle-container">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="••••••••" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+                    @endif
+                </div>
+                <button type="submit" class="btn btn-login btn-block w-100 mb-3">
+                    <span><i class="fas fa-sign-in-alt me-2"></i>LOGIN</span>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -451,6 +555,76 @@
             
             input.addEventListener('blur', () => {
                 group.style.transform = '';
+            });
+        });
+
+        // Form submission handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span><i class="fas fa-spinner fa-spin me-2"></i>LOGGING IN...</span>';
+            
+            // Save credentials if "Remember me" is checked
+            const rememberMe = document.getElementById('remember').checked;
+            if (rememberMe) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Save to localStorage (note: this is not highly secure for production)
+                localStorage.setItem('rememberMe', 'true');
+                localStorage.setItem('rememberedEmail', email);
+                localStorage.setItem('rememberedPassword', password);
+            } else {
+                // Clear saved credentials if "Remember me" is not checked
+                localStorage.removeItem('rememberMe');
+                localStorage.removeItem('rememberedEmail');
+                localStorage.removeItem('rememberedPassword');
+            }
+        });
+
+        // Auto-hide notifications after 5 seconds
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Remember me functionality - load saved credentials
+        document.addEventListener('DOMContentLoaded', function() {
+            const rememberCheckbox = document.getElementById('remember');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Check if there's a saved state in localStorage
+            const remembered = localStorage.getItem('rememberMe') === 'true';
+            if (remembered) {
+                rememberCheckbox.checked = true;
+                
+                // Load saved credentials
+                const savedEmail = localStorage.getItem('rememberedEmail');
+                const savedPassword = localStorage.getItem('rememberedPassword');
+                
+                if (savedEmail) {
+                    emailInput.value = savedEmail;
+                }
+                
+                if (savedPassword) {
+                    passwordInput.value = savedPassword;
+                }
+            }
+            
+            // Save state when checkbox changes
+            rememberCheckbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    // Clear saved credentials if unchecked
+                    localStorage.removeItem('rememberMe');
+                    localStorage.removeItem('rememberedEmail');
+                    localStorage.removeItem('rememberedPassword');
+                }
             });
         });
     </script>

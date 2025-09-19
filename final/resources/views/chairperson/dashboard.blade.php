@@ -1,587 +1,1086 @@
 @extends('chairperson.genchair')
-@section('tittle', 'Dashboard')
+@section('title', 'Dashboard')
+
 @section('content')
+    <style>
+        body {
+            font-size: 0.875rem;
+            background-color: #f5f7fa;
+        }
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <!-- Top Navigation -->
-        <!-- <div class="top-nav d-flex justify-content-between align-items-center mb-4">
-            <button class="sidebar-collapse-btn d-lg-none" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="d-flex align-items-center">
-                <div class="position-relative me-3">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="notification-badge">3</span>
-                </div>
-                <div class="user-profile">
-                    <img src="{{ Auth::user()->avatar_url ?? 'https://via.placeholder.com/40' }}" alt="User"
-                        class="rounded-circle">
-                    <span>{{ Auth::user()->name }}</span>
-                </div>
-            </div>
-        </div> -->
+        .dashboard-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+        }
 
-        <!-- Dashboard Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4><i class="fas fa-calendar me-2"></i> Task Calendar</h4>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-                <i class="fas fa-plus me-2"></i> Add Task
-            </button>
+        /* Improved Top Performers Section */
+        .top-performers-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+        }
+
+        .performer-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            border-left: 3px solid #4361ee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .performer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f0f4ff;
+        }
+
+        .performer-rank {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #4361ee;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .performer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .performer-info {
+            flex: 1;
+            min-width: 0;
+            z-index: 2;
+        }
+
+        .performer-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .performer-stats {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #4361ee;
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: #4361ee;
+            margin-left: 8px;
+            z-index: 2;
+        }
+
+        /* Progress Bar Styles */
+        .performance-progress-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .performance-progress {
+            height: 100%;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 0 6px 6px 0;
+            transform-origin: left;
+            transform: scaleX(0);
+            transition: transform 1.5s ease-out;
+        }
+
+        /* Improved Calendar Filter */
+        .calendar-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .calendar-filter-btn {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            transition: all 0.2s;
+        }
+
+        .calendar-filter-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .calendar-filter-btn.active {
+            background-color: #4361ee;
+            border-color: #4361ee;
+            color: white;
+        }
+
+        /* Rest of your existing styles... */
+        .stat-card {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 3px solid #4361ee;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(67, 97, 238, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            color: #4361ee;
+            font-size: 1rem;
+        }
+
+        .stat-card h3 {
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+
+        .stat-card p {
+            color: #7f8c8d;
+            margin-bottom: 0;
+            font-size: 0.75rem;
+        }
+
+        .section-header {
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h4 {
+            color: #4361ee;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
+
+        .section-header h4 i {
+            margin-right: 8px;
+            color: #4361ee;
+            font-size: 0.9rem;
+        }
+
+        .calendar-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            height: 100%;
+        }
+
+        .fc {
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        .fc .fc-toolbar-title {
+            font-size: 0.95rem;
+        }
+
+        .fc .fc-button {
+            padding: 3px 6px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .fc .fc-daygrid-day-frame {
+            min-height: 50px;
+        }
+
+        .fc .fc-daygrid-day-number {
+            font-size: 0.7rem;
+            padding: 2px;
+        }
+
+        .fc .fc-col-header-cell-cushion {
+            font-size: 0.7rem;
+            padding: 4px 2px;
+        }
+
+        .fc .fc-event {
+            font-size: 0.65rem;
+            padding: 1px 2px;
+            margin-bottom: 1px;
+        }
+
+        .event-list {
+            margin-top: 12px;
+        }
+
+        .event-item {
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            background-color: #f9fafb;
+            border-left: 2px solid #4361ee;
+            font-size: 0.8rem;
+        }
+
+        .event-item:hover {
+            background-color: #f0f4ff;
+        }
+
+        .event-item .event-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #2c3e50;
+        }
+
+        .event-item .event-time,
+        .event-item .event-location {
+            font-size: 0.7rem;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+        }
+
+        .event-item .event-time i,
+        .event-item .event-location i {
+            margin-right: 4px;
+        }
+
+        .analytics-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            margin-bottom: 12px;
+            height: 100%;
+        }
+
+        .analytics-header {
+            margin-bottom: 10px;
+        }
+
+        .analytics-header h5 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+
+        .main-content {
+            padding: 10px;
+        }
+
+        .row {
+            margin-left: -5px;
+            margin-right: -5px;
+        }
+
+        [class*="col-"] {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25em 0.4em;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .btn-sm {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+        }
+
+        .top-navbar {
+            padding: 5px 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-navbar .navbar-brand {
+            font-size: 0.9rem;
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            min-width: 250px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .stat-card h3 {
+                font-size: 1.1rem;
+            }
+
+            .section-header h4 {
+                font-size: 1rem;
+            }
+
+            .chart-container {
+                height: 160px;
+            }
+        }
+    </style>
+
+    @if(session('success'))
+        <div class="notification-toast alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
 
-        <!-- Stats Row -->
-        <div class="row mb-4">
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="dashboard-card">
-                    <div class="stat-number">{{ $activeTasks }}</div>
-                    <div class="stat-label">Active Tasks</div>
-                    <div class="progress mt-2" style="height: 8px;">
-                        <!-- <div class="progress-bar" style="width: {{ $activeTasks > 0 ? ($completedPercentage) : 0 }}%"></div> -->
-                    </div>
-                    <small class="text-muted">{{ $completedPercentage }}% completed</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="dashboard-card">
-                    <div class="stat-number">{{ $overdueTasks }}</div>
-                    <div class="stat-label">Overdue Tasks</div>
-                    <div class="progress mt-2" style="height: 8px;">
-                        <!-- <div class="progress-bar bg-danger" style="width: {{ $overdueTasks > 0 ? 100 : 0 }}%"></div> -->
-                    </div>
-                    <small class="text-muted">Need attention</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="dashboard-card">
-                    <div class="stat-number">{{ $completedTasks }}</div>
-                    <div class="stat-label">Completed</div>
-                    <div class="progress mt-2" style="height: 8px;">
-                        <!-- <div class="progress-bar bg-success" style="width: {{ $completedPercentage }}%"></div> -->
-                    </div>
-                    <small class="text-muted">This month</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="dashboard-card">
-                    <div class="stat-number">{{ $hoursLogged }}</div>
-                    <div class="stat-label">Hours Logged</div>
-                    <div class="progress mt-2" style="height: 8px;">
-                        <div class="progress-bar bg-info" style="width: 60%"></div>
-                    </div>
-                    <small class="text-muted">This week</small>
-                </div>
-            </div>
-        </div>
 
-        <!-- Task Calendar -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h5 class="mb-0">My Task Calendar</h5>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-secondary" id="prevWeek">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" id="today">
-                        Today
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" id="nextWeek">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-container mb-2">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3 id="totalTasks">{{ $totalTasks }}</h3>
+                    <p>Total Tasks</p>
                 </div>
             </div>
-            <div id="taskCalendar"></div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="icon">
+                        <i class="fas fa-exclamation-circle text-danger"></i>
+                    </div>
+                    <h3 id="overdueTasks">5</h3>
+                    <p>Overdue</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="icon">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <h3 id="completedTasks">12</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 id="teamMembersCount">8</h3>
+                    <p>Team Members</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Add Task Modal -->
-    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Analytics Column -->
+        <div class="col-lg-8">
+            <div class="dashboard-container">
+                <div class="section-header">
+                    <h4><i class="fas fa-chart-line"></i> Performance</h4>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="biTimeRange"
+                            data-bs-toggle="dropdown">
+                            This Month
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="#" data-range="month">This Month</a></li>
+                            <li><a class="dropdown-item" href="#" data-range="week">This Week</a></li>
+                            <li><a class="dropdown-item" href="#" data-range="quarter">This Quarter</a></li>
+                            <li><a class="dropdown-item" href="#" data-range="year">This Year</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="taskForm" action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="taskTitle" class="form-label">Task Title</label>
-                            <input type="text" class="form-control" id="taskTitle" name="title" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="taskDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="taskDescription" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="startDate" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="startDate" name="start_date" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="dueDate" class="form-label">Due Date</label>
-                                <input type="date" class="form-control" id="dueDate" name="due_date" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="taskPriority" class="form-label">Priority</label>
-                            <select class="form-select" id="taskPriority" name="priority_id" required>
-                                @foreach($priorities as $priority)
-                                    <option value="{{ $priority->id }}">{{ $priority->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="taskAssignees" class="form-label">Assignees</label>
-                            <select class="form-select" id="taskAssignees" name="assignees[]" multiple>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="attachments" class="form-label">Attachments</label>
-                            <input type="file" class="form-control" id="attachments" name="attachments[]" multiple>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Task</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Task Detail Modal -->
-    <div class="modal fade task-modal" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="taskDetailModalLabel">Task Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h4 id="detailTaskTitle"></h4>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span class="priority-badge" id="detailPriority"></span>
-                                <span class="badge bg-secondary" id="detailStatus"></span>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h5>Completion Rate</h5>
+                                <span class="badge bg-light text-dark">Current</span>
                             </div>
-                            <p id="detailDescription" class="mb-4"></p>
+                            <div class="chart-container">
+                                <canvas id="completionRateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h5>Performance Trend</h5>
+                                <span class="badge bg-light text-dark">6 Months</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="performanceTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="task-meta mb-4">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <strong><i class="fas fa-user me-2"></i>Assigned by:</strong>
-                                            <span id="detailCreator"></span>
-                                        </div>
-                                        <div class="mb-3">
-                                            <strong><i class="fas fa-calendar-plus me-2"></i>Start Date:</strong>
-                                            <span id="detailStartDate"></span>
+                <!-- Improved Top Performers Section -->
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <div class="analytics-card">
+                            <div class="section-header">
+                                <h5>
+                                    Top Performers
+                                    <div class="dropdown d-inline ms-2">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+                                            id="topPerformersRange" data-bs-toggle="dropdown" aria-expanded="false">
+                                            This Month
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="topPerformersRange">
+                                            <li><a class="dropdown-item active" href="#" data-range="month">This Month</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#" data-range="week">This Week</a></li>
+                                            <li><a class="dropdown-item" href="#" data-range="quarter">This Quarter</a></li>
+                                            <li><a class="dropdown-item" href="#" data-range="year">This Year</a></li>
+                                        </ul>
+                                    </div>
+                                </h5>
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    document.querySelectorAll('#topPerformersRange .dropdown-item').forEach(item => {
+                                        item.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            const range = this.getAttribute('data-range');
+                                            const button = document.getElementById('topPerformersRange');
+                                            button.textContent = this.textContent;
+                                            document.querySelectorAll('#topPerformersRange .dropdown-item').forEach(i => {
+                                                i.classList.remove('active');
+                                            });
+                                            this.classList.add('active');
+                                            // In a real app, update the top performers list here via AJAX or JS
+                                            console.log('Top Performers range changed to:', range);
+                                        });
+                                    });
+                                });
+                            </script>
+                            <div class="top-performers-container">
+                                <div class="performer-card">
+                                    <div class="performance-progress-container">
+                                        <div class="performance-progress" style="width: 95%"></div>
+                                    </div>
+                                    <div class="performer-rank">1</div>
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="performer-avatar">
+                                    <div class="performer-info">
+                                        <div class="performer-name">Sarah Johnson</div>
+                                        <div class="performer-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-value">18</div>
+                                                <div class="stat-label">Tasks</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">92%</div>
+                                                <div class="stat-label">On Time</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">4.8</div>
+                                                <div class="stat-label">Quality</div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <strong><i class="fas fa-calendar-check me-2"></i>Due Date:</strong>
-                                            <span id="detailDueDate"></span>
-                                        </div>
-                                        <div class="mb-3">
-                                            <strong><i class="fas fa-users me-2"></i>Assignees:</strong>
-                                            <span id="detailAssignees"></span>
+                                    <div class="performance-badge">95%</div>
+                                </div>
+                                <div class="performer-card">
+                                    <div class="performance-progress-container">
+                                        <div class="performance-progress" style="width: 90%"></div>
+                                    </div>
+                                    <div class="performer-rank">2</div>
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="performer-avatar">
+                                    <div class="performer-info">
+                                        <div class="performer-name">Michael Chen</div>
+                                        <div class="performer-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-value">15</div>
+                                                <div class="stat-label">Tasks</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">88%</div>
+                                                <div class="stat-label">On Time</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">4.7</div>
+                                                <div class="stat-label">Quality</div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="performance-badge">90%</div>
                                 </div>
-                            </div>
-
-                            <!-- Progress Section -->
-                            <div class="progress-section mb-4">
-                                <div class="progress mb-2">
-                                    <div class="progress-bar" id="detailProgress" role="progressbar" style="width: 0%">
+                                <div class="performer-card">
+                                    <div class="performance-progress-container">
+                                        <div class="performance-progress" style="width: 89%"></div>
                                     </div>
-                                </div>
-                                <small class="text-muted" id="progressText">Task progress</small>
-                            </div>
-
-                            <!-- Completion Section -->
-                            <div class="completion-section mb-4" id="completionSection" style="display: none;">
-                                <hr>
-                                <h5><i class="fas fa-check-circle me-2"></i>Submit Completion</h5>
-                                <div class="mb-3">
-                                    <label for="completionComments" class="form-label">Completion Notes</label>
-                                    <textarea class="form-control" id="completionComments" rows="3"
-                                        placeholder="Describe what you've completed and any important details"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="completionAttachments" class="form-label">Supporting Documents</label>
-                                    <input type="file" class="form-control" id="completionAttachments"
-                                        name="completion_attachments[]" multiple>
-                                    <small class="text-muted">Upload any files that prove task completion</small>
-                                </div>
-                            </div>
-
-                            <!-- Comments Section - Fixed Implementation -->
-                            <div class="comments-section mb-4">
-                                <hr>
-                                <h5><i class="fas fa-comments me-2"></i>Task Comments</h5>
-                                <div id="commentsList" class="mb-3">
-                                    <!-- Comments will be loaded here -->
-                                </div>
-                                <div class="add-comment">
-                                    <form id="commentForm">
-                                        @csrf
-                                        <input type="hidden" id="commentTaskId" name="task_id">
-                                        <textarea class="form-control mb-2" id="newComment" name="comment"
-                                            placeholder="Add a comment..." required></textarea>
-                                        <button type="submit" class="btn btn-sm btn-primary">Add Comment</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <!-- Attachments Section -->
-                            <div class="attachments-section">
-                                <h5><i class="fas fa-paperclip me-2"></i>Attachments</h5>
-                                <div id="attachmentsList" class="list-group">
-                                    <!-- Attachments will be loaded here -->
-                                </div>
-
-                                <!-- Add Attachment Button -->
-                                <div class="add-attachment mt-3" id="addAttachmentSection">
-                                    <form id="attachmentForm">
-                                        @csrf
-                                        <input type="hidden" id="attachmentTaskId" name="task_id">
-                                        <input type="file" class="form-control mb-2" id="newAttachment" name="attachments[]"
-                                            multiple>
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">Upload File</button>
-                                    </form>
+                                    <div class="performer-rank">3</div>
+                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="performer-avatar">
+                                    <div class="performer-info">
+                                        <div class="performer-name">Emily Rodriguez</div>
+                                        <div class="performer-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-value">12</div>
+                                                <div class="stat-label">Tasks</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">85%</div>
+                                                <div class="stat-label">On Time</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-value">4.9</div>
+                                                <div class="stat-label">Quality</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="performance-badge">89%</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <div id="completionControls">
-                        <!-- Completion checkbox will be placed here dynamically -->
+            </div>
+        </div>
+
+        <!-- Calendar Column -->
+        <div class="col-lg-4">
+            <div class="calendar-container" style="height: 100%; display: flex; flex-direction: column;">
+                <div class="section-header">
+                    <h4><i class="fas fa-calendar-alt"></i> Schedule</h4>
+                    <button class="btn btn-sm btn-primary" id="addEventBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <!-- Calendar Filter -->
+                <div class="calendar-filter">
+                    <button class="calendar-filter-btn active" data-type="all">All</button>
+                    <button class="calendar-filter-btn" data-type="event">Events</button>
+                    <button class="calendar-filter-btn" data-type="task">Tasks</button>
+                    <button class="calendar-filter-btn" data-type="meeting">Meetings</button>
+                </div>
+
+                <!-- Fixed Calendar Height (inline) -->
+                <div id="calendar" class="fc fc-media-screen fc-direction-ltr fc-theme-standard"
+                    style="flex: 1; min-height: 370px;"></div>
+
+                <!-- Event List (with scroll if needed) -->
+                <div class="event-list" style="overflow-y: auto; max-height: 200px;">
+                    <h5 class="mb-2">Today</h5>
+                    <div id="todaysEvents">
+                        <div class="event-item">
+                            <div class="event-title">Team Standup</div>
+                            <div class="event-time">
+                                <i class="far fa-clock me-1"></i>
+                                10:00 - 10:30 AM
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-map-marker-alt"></i> Conf Room A
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-title">Client Meeting</div>
+                            <div class="event-time">
+                                <i class="far fa-clock me-1"></i>
+                                2:00 - 3:30 PM
+                            </div>
+                            <div class="event-location">
+                                <i class="fas fa-video"></i> Zoom
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="updateTask">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Bottom Row -->
+    <div class="row mt-2" style="font-size: 0.7rem;">
+        <div class="col-md-6">
+            <div class="dashboard-container p-2">
+                <div class="section-header mb-1" style="padding-bottom: 2px;">
+                    <h6 class="m-0" style="font-size: 0.8rem;"><i class="fas fa-clock"></i> Approvals</h6>
+                    <span class="badge bg-danger" style="font-size: 0.65rem;">3 Urgent</span>
+                </div>
+                <div id="pendingApprovals">
+                    <div class="task-item d-flex align-items-center mb-1" style="font-size: 0.7rem; min-height: 32px;">
+                        <div class="task-check me-2" style="font-size: 0.9rem;">
+                            <i class="fas fa-file-invoice-dollar text-primary"></i>
+                        </div>
+                        <div class="task-info flex-grow-1">
+                            <div style="font-weight: 500; font-size: 0.75rem;">Budget Approval
+                                <span class="priority-badge priority-high ms-1" style="font-size: 0.6rem;">High</span>
+                            </div>
+                            <div class="task-meta d-flex flex-wrap gap-1" style="font-size: 0.65rem;">
+                                <span><i class="fas fa-user"></i> Finance</span>
+                                <span><i class="fas fa-calendar-alt"></i> Due tomorrow</span>
+                                <span class="status-badge status-pending_approval">Pending</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-primary ms-2"
+                            style="font-size: 0.65rem; padding: 1px 6px;">Review</a>
+                    </div>
+                    <div class="task-item d-flex align-items-center mb-1" style="font-size: 0.7rem; min-height: 32px;">
+                        <div class="task-check me-2" style="font-size: 0.9rem;">
+                            <i class="fas fa-users text-primary"></i>
+                        </div>
+                        <div class="task-info flex-grow-1">
+                            <div style="font-weight: 500; font-size: 0.75rem;">Hiring Request
+                                <span class="priority-badge priority-medium ms-1" style="font-size: 0.6rem;">Medium</span>
+                            </div>
+                            <div class="task-meta d-flex flex-wrap gap-1" style="font-size: 0.65rem;">
+                                <span><i class="fas fa-user"></i> HR</span>
+                                <span><i class="fas fa-calendar-alt"></i> Due in 3 days</span>
+                                <span class="status-badge status-pending">Pending</span>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-primary ms-2"
+                            style="font-size: 0.65rem; padding: 1px 6px;">Review</a>
+                    </div>
+                </div>
+                <div class="text-center mt-1">
+                    <a href="#" class="btn btn-link btn-sm" style="font-size: 0.65rem;">View All</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-container p-2">
+                <div class="section-header mb-1" style="padding-bottom: 2px;">
+                    <h6 class="m-0" style="font-size: 0.8rem;"><i class="fas fa-history"></i> Recent Activity</h6>
+                    <span class="badge bg-light text-dark" style="font-size: 0.65rem;">7 Days</span>
+                </div>
+                <div id="recentActivity">
+                    <div class="task-item d-flex align-items-center mb-1" style="font-size: 0.7rem; min-height: 32px;">
+                        <div class="task-check me-2">
+                            <img src="https://randomuser.me/api/portraits/men/22.jpg" class="assignee"
+                                style="width: 22px; height: 22px; border-radius: 50%;">
+                        </div>
+                        <div class="task-info flex-grow-1">
+                            <div style="font-weight: 500; font-size: 0.75rem;">Alex updated "Project Proposal"</div>
+                            <div class="task-meta d-flex flex-wrap gap-1" style="font-size: 0.65rem;">
+                                <span><i class="fas fa-clock"></i> 2h ago</span>
+                                <span class="status-badge status-in-progress">In Progress</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-item d-flex align-items-center mb-1" style="font-size: 0.7rem; min-height: 32px;">
+                        <div class="task-check me-2">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" class="assignee"
+                                style="width: 22px; height: 22px; border-radius: 50%;">
+                        </div>
+                        <div class="task-info flex-grow-1">
+                            <div style="font-weight: 500; font-size: 0.75rem;">Jessica submitted "Marketing Plan"</div>
+                            <div class="task-meta d-flex flex-wrap gap-1" style="font-size: 0.65rem;">
+                                <span><i class="fas fa-clock"></i> 5h ago</span>
+                                <span class="status-badge status-completed">Completed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-1">
+                    <a href="#" class="btn btn-link btn-sm" style="font-size: 0.65rem;">View All</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include libraries -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Get tasks from server via AJAX
-            fetch('{{ route("api.tasks") }}')
-                .then(response => response.json())
-                .then(data => {
-                    initializeCalendar(data);
-                })
-                .catch(error => {
-                    console.error('Error loading tasks:', error);
-                    alert('Error loading tasks. Please refresh the page.');
+        // Initialize compact charts
+        function initCharts() {
+            // Completion Rate Chart
+            const completionRateCtx = document.getElementById('completionRateChart');
+            if (completionRateCtx) {
+                new Chart(completionRateCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'In Progress', 'Overdue'],
+                        datasets: [{
+                            data: [12, 7, 5],
+                            backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+                            borderWidth: 0,
+                            borderRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 10,
+                                    font: {
+                                        size: 9
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `${context.label}: ${context.raw} (${Math.round(context.raw / 24 * 100)}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 });
+            }
 
-            function initializeCalendar(taskData) {
-                const calendarEl = document.getElementById('taskCalendar');
+            // Performance Trend Chart
+            const performanceTrendCtx = document.getElementById('performanceTrendChart');
+            if (performanceTrendCtx) {
+                new Chart(performanceTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Task Completion',
+                            data: [65, 59, 80, 81, 76, 85],
+                            borderColor: '#4e73df',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            tension: 0.3,
+                            borderWidth: 2,
+                            fill: true,
+                            pointBackgroundColor: '#4e73df',
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }, {
+                            label: 'On-Time',
+                            data: [70, 65, 75, 77, 80, 82],
+                            borderColor: '#1cc88a',
+                            backgroundColor: 'rgba(28, 200, 138, 0.05)',
+                            tension: 0.3,
+                            borderWidth: 2,
+                            fill: true,
+                            pointBackgroundColor: '#1cc88a',
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 10,
+                                    font: {
+                                        size: 9
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: {
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    callback: function (value) {
+                                        return value + '%';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize calendar with filter functionality
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                // Sample events data with types
+                const events = [
+                    {
+                        title: 'Planning Session',
+                        start: new Date(new Date().setDate(new Date().getDate() + 2)),
+                        color: '#4e73df',
+                        extendedProps: {
+                            description: 'Quarterly planning session',
+                            type: 'meeting'
+                        }
+                    },
+                    {
+                        title: 'Product Launch',
+                        start: new Date(new Date().setDate(new Date().getDate() + 5)),
+                        color: '#1cc88a',
+                        extendedProps: {
+                            description: 'New product launch',
+                            type: 'event'
+                        }
+                    },
+                    {
+                        title: 'Bug Fix Deadline',
+                        start: new Date(new Date().setDate(new Date().getDate() + 3)),
+                        color: '#f6c23e',
+                        extendedProps: {
+                            description: 'Critical bug fixes due',
+                            type: 'task'
+                        }
+                    },
+                    {
+                        title: 'Client Demo',
+                        start: new Date(new Date().setDate(new Date().getDate() + 7)),
+                        color: '#e74a3b',
+                        extendedProps: {
+                            description: 'Demo for new client',
+                            type: 'meeting'
+                        }
+                    }
+                ];
+
                 const calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     headerToolbar: {
-                        left: 'prev,next today',
+                        left: 'prev,next',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        right: ''
                     },
-                    events: taskData.map(task => ({
-                        id: task.id,
-                        title: task.title,
-                        start: task.start_date || task.created_at,
-                        end: task.due_date,
-                        className: `fc-event-${task.priority.name.toLowerCase()}-priority`,
-                        extendedProps: {
-                            description: task.description,
-                            priority: task.priority,
-                            status: task.user_status || 'pending',
-                            creator: task.creator,
-                            assignees: task.users || [],
-                            attachments: task.attachments || [],
-                            comments: task.comments || [],
-                            task_id: task.id,
-                            is_participant: task.is_participant
-                        }
-                    })),
+                    events: events,
+                    dayMaxEventRows: 1,
+                    height: 250,
                     eventClick: function (info) {
-                        const task = info.event;
-                        const props = task.extendedProps;
+                        info.jsEvent.preventDefault();
 
-                        // Set the task ID for forms
-                        document.getElementById('commentTaskId').value = props.task_id;
-                        document.getElementById('attachmentTaskId').value = props.task_id;
+                        const modal = new bootstrap.Modal(document.getElementById('eventModal'));
+                        const modalTitle = document.getElementById('eventModalTitle');
+                        const modalBody = document.getElementById('eventModalBody');
 
-                        // Populate task details (same as before)
-                        document.getElementById('detailTaskTitle').textContent = task.title;
-                        document.getElementById('detailDescription').textContent = props.description || 'No description provided';
-                        document.getElementById('detailCreator').textContent = props.creator ? props.creator.name : 'Unknown';
-
-                        // Set priority badge
-                        const priorityBadge = document.getElementById('detailPriority');
-                        const priorityName = props.priority.name || 'Medium';
-                        priorityBadge.textContent = priorityName;
-                        priorityBadge.className = 'priority-badge ';
-                        if (priorityName.toLowerCase() === 'high') {
-                            priorityBadge.className += 'priority-high';
-                        } else if (priorityName.toLowerCase() === 'medium') {
-                            priorityBadge.className += 'priority-medium';
-                        } else {
-                            priorityBadge.className += 'priority-low';
-                        }
-
-                        // Set status
-                        const statusElement = document.getElementById('detailStatus');
-                        statusElement.textContent = props.status;
-
-                        // Format dates
-                        const startDate = task.start ? new Date(task.start) : new Date();
-                        const dueDate = task.end ? new Date(task.end) : new Date(task.start);
-
-                        document.getElementById('detailStartDate').textContent = startDate.toLocaleDateString();
-                        document.getElementById('detailDueDate').textContent = dueDate.toLocaleDateString();
-
-                        // Set assignees
-                        const assigneesElement = document.getElementById('detailAssignees');
-                        assigneesElement.innerHTML = '';
-
-                        if (props.assignees && props.assignees.length > 0) {
-                            const assigneeNames = props.assignees.map(user => user.name).join(', ');
-                            assigneesElement.textContent = assigneeNames;
-                        } else {
-                            assigneesElement.textContent = 'No assignees';
-                        }
-
-                        // Set progress
-                        const progressBar = document.getElementById('detailProgress');
-                        const progressText = document.getElementById('progressText');
-                        if (props.status && props.status.toLowerCase() === 'completed') {
-                            progressBar.style.width = '100%';
-                            progressBar.textContent = 'Completed';
-                            progressBar.className = 'progress-bar bg-success';
-                            progressText.textContent = 'Task completed';
-                        } else if (props.status && props.status.toLowerCase() === 'in_progress') {
-                            progressBar.style.width = '60%';
-                            progressBar.textContent = 'In Progress';
-                            progressBar.className = 'progress-bar bg-warning';
-                            progressText.textContent = 'Task in progress - completion submitted';
-                        } else {
-                            progressBar.style.width = '30%';
-                            progressBar.textContent = 'Pending';
-                            progressBar.className = 'progress-bar bg-info';
-                            progressText.textContent = 'Task pending';
-                        }
-
-                        // Load attachments
-                        const attachmentsList = document.getElementById('attachmentsList');
-                        attachmentsList.innerHTML = '';
-
-                        if (props.attachments && props.attachments.length > 0) {
-                            props.attachments.forEach(attachment => {
-                                const fileLink = document.createElement('a');
-                                fileLink.href = `/storage/${attachment.path}`;
-                                fileLink.target = '_blank';
-                                fileLink.className = 'list-group-item list-group-item-action';
-
-                                const fileIcon = getFileIcon(attachment.type);
-                                const uploadDate = new Date(attachment.created_at).toLocaleDateString();
-
-                                fileLink.innerHTML = `
-                                <div class="d-flex w-100 justify-content-between">
-                                    <div>
-                                        <i class="${fileIcon} me-2"></i>
-                                        ${attachment.filename}
-                                    </div>
-                                    <small>${uploadDate}</small>
-                                </div>
-                                <div class="d-flex w-100 justify-content-between">
-                                    <small class="text-muted">${formatFileSize(attachment.size)}</small>
-                                    <small>Uploaded by: ${attachment.uploaded_by}</small>
-                                </div>
+                        modalTitle.textContent = info.event.title;
+                        modalBody.innerHTML = `
+                                <p><strong>Date:</strong> ${info.event.start.toLocaleDateString()}</p>
+                                <p><strong>Type:</strong> ${info.event.extendedProps.type.charAt(0).toUpperCase() + info.event.extendedProps.type.slice(1)}</p>
+                                ${info.event.extendedProps.description ?
+                                `<p><strong>Description:</strong> ${info.event.extendedProps.description}</p>` : ''}
                             `;
 
-                                attachmentsList.appendChild(fileLink);
-                            });
-                        } else {
-                            const noAttachments = document.createElement('div');
-                            noAttachments.className = 'list-group-item';
-                            noAttachments.textContent = 'No attachments yet';
-                            attachmentsList.appendChild(noAttachments);
-                        }
-
-                        // Load comments - Fixed Implementation
-                        const commentsList = document.getElementById('commentsList');
-                        commentsList.innerHTML = '';
-
-                        if (props.comments && props.comments.length > 0) {
-                            props.comments.forEach(comment => {
-                                const commentElement = document.createElement('div');
-                                commentElement.className = 'card mb-2';
-                                commentElement.innerHTML = `
-                                <div class="card-body p-2">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>${comment.user.name}</strong>
-                                        <small class="text-muted">${new Date(comment.created_at).toLocaleString()}</small>
-                                    </div>
-                                    <p class="mb-0 mt-1">${comment.comment}</p>
-                                </div>
-                            `;
-                                commentsList.appendChild(commentElement);
-                            });
-                        } else {
-                            const noComments = document.createElement('div');
-                            noComments.className = 'alert alert-info';
-                            noComments.textContent = 'No comments yet';
-                            commentsList.appendChild(noComments);
-                        }
-
-                        // Show modal
-                        const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
                         modal.show();
                     }
                 });
-
                 calendar.render();
 
-                // Navigation buttons
-                document.getElementById('prevWeek').addEventListener('click', function () {
-                    calendar.prev();
-                });
+                // Calendar filter functionality
+                const filterButtons = document.querySelectorAll('.calendar-filter-btn');
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        // Remove active class from all buttons
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
 
-                document.getElementById('today').addEventListener('click', function () {
-                    calendar.today();
-                });
+                        // Add active class to clicked button
+                        this.classList.add('active');
 
-                document.getElementById('nextWeek').addEventListener('click', function () {
-                    calendar.next();
-                });
-            }
+                        const filterType = this.getAttribute('data-type');
 
-            // Fixed Comment Submission
-            document.getElementById('commentForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-                const taskId = document.getElementById('commentTaskId').value;
-
-                fetch(`/tasks/${taskId}/comments`, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            // Clear the comment field
-                            document.getElementById('newComment').value = '';
-
-                            // Refresh the calendar to show new comment
-                            const calendarEl = document.getElementById('taskCalendar');
-                            const calendar = FullCalendar.getCalendar(calendarEl);
-                            calendar.refetchEvents();
-
-                            // Show success message
-                            alert('Comment added successfully');
+                        if (filterType === 'all') {
+                            // Show all events
+                            calendar.getEvents().forEach(event => {
+                                event.setProp('display', 'auto');
+                            });
+                        } else {
+                            // Filter events by type
+                            calendar.getEvents().forEach(event => {
+                                if (event.extendedProps.type === filterType) {
+                                    event.setProp('display', 'auto');
+                                } else {
+                                    event.setProp('display', 'none');
+                                }
+                            });
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error adding comment:', error);
-                        alert('Error adding comment. Please try again.');
                     });
+                });
+            }
+        }
+
+        // Animate progress bars
+        function animateProgressBars() {
+            document.querySelectorAll('.performance-progress').forEach(progress => {
+                // Get the width from the style attribute
+                const width = progress.style.width;
+                // Reset to 0 for animation
+                progress.style.transform = 'scaleX(0)';
+                // Trigger reflow
+                progress.offsetHeight;
+                // Animate to full width
+                progress.style.transform = 'scaleX(1)';
             });
+        }
 
-            // File Attachment Submission
-            document.getElementById('attachmentForm').addEventListener('submit', function (e) {
-                e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
 
-                const formData = new FormData(this);
-                const taskId = document.getElementById('attachmentTaskId').value;
+            // Initialize components
+            initCalendar();
+            initCharts();
+            animateProgressBars();
 
-                fetch(`/tasks/${taskId}/attachments`, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            // Clear the file input
-                            document.getElementById('newAttachment').value = '';
-
-                            // Refresh the calendar to show new attachment
-                            const calendarEl = document.getElementById('taskCalendar');
-                            const calendar = FullCalendar.getCalendar(calendarEl);
-                            calendar.refetchEvents();
-
-                            // Show success message
-                            alert('Files uploaded successfully');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error uploading files:', error);
-                        alert('Error uploading files. Please try again.');
+            // Notification functionality
+            const markAllReadBtn = document.querySelector('.mark-all-read');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
                     });
-            });
-
-            // Toggle sidebar on mobile
-            document.getElementById('sidebarToggle').addEventListener('click', function () {
-                document.getElementById('sidebar').classList.toggle('active');
-                document.getElementById('mainContent').classList.toggle('active');
-            });
-
-            // Helper functions
-            function getFileIcon(mimeType) {
-                if (!mimeType) return 'fas fa-file';
-
-                if (mimeType.startsWith('image/')) {
-                    return 'fas fa-file-image';
-                } else if (mimeType === 'application/pdf') {
-                    return 'fas fa-file-pdf';
-                } else if (mimeType.startsWith('video/')) {
-                    return 'fas fa-file-video';
-                } else if (mimeType.startsWith('audio/')) {
-                    return 'fas fa-file-audio';
-                } else if (mimeType.startsWith('application/vnd.ms-excel') || mimeType.includes('spreadsheetml')) {
-                    return 'fas fa-file-excel';
-                } else if (mimeType.startsWith('application/msword') || mimeType.includes('wordprocessingml')) {
-                    return 'fas fa-file-word';
-                } else if (mimeType.startsWith('application/zip') || mimeType.includes('compressed')) {
-                    return 'fas fa-file-archive';
-                } else {
-                    return 'fas fa-file';
-                }
+                    document.getElementById('notificationBadge').textContent = '0';
+                    document.getElementById('notificationCount').textContent = '0';
+                });
             }
 
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
+            // Time range filter functionality
+            document.querySelectorAll('#biTimeRange .dropdown-item').forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const range = this.getAttribute('data-range');
+                    const button = document.getElementById('biTimeRange');
 
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    // Update button text
+                    button.textContent = this.textContent;
 
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
+                    // Remove active class from all items
+                    document.querySelectorAll('#biTimeRange .dropdown-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+
+                    // Add active class to clicked item
+                    this.classList.add('active');
+
+                    // In a real app, this would trigger an AJAX call to update charts
+                    console.log('Time range changed to:', range);
+                });
+            });
+
+            // Add event button functionality
+            document.getElementById('addEventBtn')?.addEventListener('click', function () {
+                // In a real app, this would open a modal to add a new event
+                alert('Add new event functionality would go here');
+            });
         });
     </script>
+
+    <!-- Event Modal (hidden by default) -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventModalTitle">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="eventModalBody">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary">Edit Event</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

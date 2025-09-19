@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use League\CommonMark\Extension\CommonMark\Parser\Inline\EscapableParser;
 
 class LoginController extends Controller
 {
@@ -27,7 +31,8 @@ class LoginController extends Controller
      */
     protected function redirectTo()
     {
-        if (\Illuminate\Support\Facades\Auth::check()) {
+        if (Auth::check()) {
+            // return '/verify';
             $user = \Illuminate\Support\Facades\Auth::user();
             $roleId = $user->role->id ?? null;
 
@@ -37,23 +42,29 @@ class LoginController extends Controller
                 'email' => $user->email,
                 'timestamp' => now()->toDateTimeString(),
             ]);
-
-            switch ($roleId) {
-                case 1:
-                    return '/admin/dashboard';
-                case 2:
-                    return '/chairperson/dashboard';
-                case 3:
-                    return '/employee/dashboard';
-                default:
-                    return '/home';
+            // Redirect newly created users to change their password
+            if ($user->default_password == 1) {
+                return '/change-password';
+            } else {
+                switch ($roleId) {
+                    case 1:
+                        return '/admin/dashboard';
+                    case 2:
+                        return '/chairperson/dashboard';
+                    case 3:
+                        return '/employee/dashboard';
+                    default:
+                        return '/home';
+                }
             }
+
+
         }
 
         return '/home';
     }
-    
-    
+
+
 
     /**
      * Create a new controller instance.
